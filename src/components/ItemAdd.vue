@@ -1,9 +1,6 @@
 <template>
   <div class="lesson">
     <div class="content-container">
-      <md-card-actions>
-        <md-button class="md-accent" @click="removeItem(lessonItem)">Remove</md-button>
-      </md-card-actions>
       <md-field>
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
@@ -71,7 +68,7 @@
       </md-field>
       <md-card-actions>
         <md-button class="md-primary" @click="cancel()">Cancel</md-button>
-        <md-button class="md-primary" @click="updateItem(lessonItem)">Save</md-button>
+        <md-button class="md-primary" @click="addItem(lessonItem)">Add</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="headerDialogActive">
         <md-dialog-title>New Header Highlight</md-dialog-title>
@@ -132,8 +129,7 @@ export default {
     category: String,
     seriesName: String,
     lessonName: String,
-    sectionName: String,
-    lessonItemKey: String
+    sectionName: String
   },
   data () {
     return {
@@ -146,6 +142,8 @@ export default {
       lessonItem: {
         header: '',
         details: '',
+        type: 'text',
+        style: 'regular',
         headerUrls: [],
         headerHighlights: [],
         detailsHighlights: [],
@@ -154,15 +152,6 @@ export default {
     }
   },
   mounted () {
-    this.$watch('sectionName', () => {
-      if (this.sectionName === 'reviewCards') {
-        this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(this.lessonItemKey))
-      } else {
-        this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(this.lessonItemKey))
-      }
-    }, {
-      immediate: true
-    })
   },
   methods: {
     cancel: function () {
@@ -218,6 +207,14 @@ export default {
       this.newDetailUrl = ''
       this.detailDialogActive = false
     },
+    addItem: function (item) {
+      if (this.sectionName === 'reviewCards') {
+        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
+      } else {
+        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
+      }
+      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
+    },
     updateItem: function (item) {
       // create a copy of the item
       const copy = { ...item }
@@ -227,14 +224,6 @@ export default {
         db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
       } else {
         db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).set(copy)
-      }
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
-    },
-    removeItem: function (item) {
-      if (this.sectionName === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).remove()
-      } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).remove()
       }
       this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
     }

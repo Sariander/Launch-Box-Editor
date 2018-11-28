@@ -6,6 +6,7 @@ import FollowUp from '@/components/FollowUp'
 import Series from '@/components/Series'
 import Lesson from '@/components/Lesson'
 import ItemEdit from '@/components/ItemEdit'
+import ItemAdd from '@/components/ItemAdd'
 
 Vue.use(Router)
 
@@ -41,9 +42,15 @@ export default new Router({
       props: true
     },
     {
-      path: '/:category/:seriesName/:lessonName/:sectionName/:lessonItemKey',
+      path: '/:category/:seriesName/:lessonName/:sectionName/edit/:lessonItemKey',
       name: 'edit',
       component: ItemEdit,
+      props: true
+    },
+    {
+      path: '/:category/:seriesName/:lessonName/:sectionName/add/',
+      name: 'add',
+      component: ItemAdd,
       props: true
     }
   ]

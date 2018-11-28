@@ -27,7 +27,7 @@
 
 <script>
 import Vue from 'vue'
-import { MdApp, MdList, MdIcon, MdToolbar, MdDrawer, MdButton, MdContent, MdCard, MdRipple, MdProgress, MdBottomBar, MdTabs, MdDialog, MdSpeedDial, MdTooltip, MdField, MdMenu } from 'vue-material/dist/components'
+import { MdApp, MdList, MdIcon, MdToolbar, MdDrawer, MdButton, MdContent, MdCard, MdRipple, MdProgress, MdBottomBar, MdTabs, MdDialog, MdSpeedDial, MdTooltip, MdField, MdMenu, MdSwitch } from 'vue-material/dist/components'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 
@@ -48,6 +48,7 @@ Vue.use(MdField)
 Vue.use(MdMenu)
 Vue.use(MdSpeedDial)
 Vue.use(MdTooltip)
+Vue.use(MdSwitch)
 
 export default {
   name: 'app',
