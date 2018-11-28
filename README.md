@@ -1,6 +1,6 @@
-# pwa-practice
+# Thrive Studies Editor
 
-> Basic PWA App
+> Thrive Studies backend editor
 
 ## Build Setup
 
