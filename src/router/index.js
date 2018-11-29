@@ -36,7 +36,7 @@ export default new Router({
       props: true
     },
     {
-      path: '/:category/:seriesName/:lessonName',
+      path: '/:category/:seriesName/:lessonName/:section',
       name: 'lesson',
       component: Lesson,
       props: true

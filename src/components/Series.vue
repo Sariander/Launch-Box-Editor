@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     goToSpecificLesson (lessonName) {
-      this.$router.push({name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: lessonName, sectionName: 'study' }})
+      this.$router.push({name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: lessonName, section: 'study' }})
     }
   },
   firebase () {

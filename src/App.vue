@@ -90,9 +90,43 @@ export default {
       ]
     }
   },
+  mounted () {
+    this.setTitle(this.$route)
+  },
+  watch: {
+    $route (to, from) {
+      this.setTitle(to)
+    }
+  },
   methods: {
     navigateToTab (route, text) {
       this.$router.push({ name: route, params: { category: text } })
+    },
+    setTitle (route) {
+      switch (route.name) {
+        case 'Home':
+          this.title = 'Thrive Studies'
+          break
+        case 'followup':
+          this.title = 'Follow Up'
+          break
+        case 'thrive':
+          this.title = route.params.category
+          break
+        case 'series':
+          this.title = route.params.category + ' / ' + route.params.seriesName
+          break
+        case 'lesson':
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName
+          break
+        case 'edit':
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Edit'
+          break
+        case 'add':
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Add'
+          break
+        default:
+      }
     }
   }
 }

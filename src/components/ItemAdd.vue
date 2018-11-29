@@ -155,7 +155,7 @@ export default {
   },
   methods: {
     cancel: function () {
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
+      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     },
     addHeaderItem: function () {
       if (!this.lessonItem.headerHighlights) {
@@ -213,7 +213,7 @@ export default {
       } else {
         db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
       }
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
+      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     },
     updateItem: function (item) {
       // create a copy of the item
@@ -225,7 +225,7 @@ export default {
       } else {
         db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).set(copy)
       }
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName } })
+      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     }
   }
 }

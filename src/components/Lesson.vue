@@ -1,10 +1,10 @@
 <template>
   <div class="lesson">
-    <md-tabs md-alignment="centered" md-sync-route>
-      <md-tab v-on:click="changeSectionTab('study')" md-label="The Study"></md-tab>
-      <md-tab v-on:click="changeSectionTab('leadersGuide')" md-label="Leader's Guide"></md-tab>
-      <md-tab v-on:click="changeSectionTab('ideaBox')" md-label="Idea Box"></md-tab>
-      <md-tab v-on:click="changeSectionTab('reviewCards')" md-label="Review Cards"></md-tab>
+    <md-tabs :md-active-tab="currentTab" md-alignment="centered">
+      <md-tab id="study" :to="studyRoute" replace md-label="The Study"></md-tab>
+      <md-tab id="leaders" :to="leaderRoute" replace md-label="Leader's Guide"></md-tab>
+      <md-tab id="idea" :to="ideaRoute" replace md-label="Idea Box"></md-tab>
+      <md-tab id="review" :to="reviewRoute" replace md-label="Review Cards"></md-tab>
     </md-tabs>
     <md-dialog-actions>
       <md-switch v-model="canDrag">Reorder</md-switch>
@@ -48,13 +48,13 @@ export default {
   props: {
     category: String,
     seriesName: String,
-    lessonName: String
+    lessonName: String,
+    section: String
   },
   data () {
     return {
-      tempItem: null,
+      currentTab: '',
       canDrag: false,
-      section: 'study',
       lessonItems: [],
       displayedList: [],
       showDialog: false,
@@ -65,7 +65,11 @@ export default {
         headerHighlights: [''],
         detailsUrls: [''],
         detailsHighlights: ['']
-      }
+      },
+      studyRoute: '',
+      leaderRoute: '',
+      ideaRoute: '',
+      reviewRoute: ''
     }
   },
   firebase () {
@@ -77,21 +81,33 @@ export default {
     }
   },
   mounted () {
-    switch (this.section) {
-      case 'study':
-        this.displayedList = this.studyList
-        break
-      case 'leadersGuide':
-        this.displayedList = this.leadersGuideList
-        break
-      case 'ideaBox':
-        this.displayedList = this.ideaBoxList
-        break
-      case 'reviewCards':
-        this.displayedList = this.reviewCardsList
-        break
-      default:
-    }
+    this.studyRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/study'
+    this.leaderRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/leadersGuide'
+    this.ideaRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/ideaBox'
+    this.reviewRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/reviewCards'
+    this.$watch('section', () => {
+      switch (this.section) {
+        case 'study':
+          this.currentTab = 'study'
+          this.displayedList = this.studyList
+          break
+        case 'leadersGuide':
+          this.currentTab = 'leaders'
+          this.displayedList = this.leadersGuideList
+          break
+        case 'ideaBox':
+          this.currentTab = 'idea'
+          this.displayedList = this.ideaBoxList
+          break
+        case 'reviewCards':
+          this.currentTab = 'review'
+          this.displayedList = this.reviewCardsList
+          break
+        default:
+      }
+    }, {
+      immediate: true
+    })
   },
   methods: {
     highlight (content, highlights) {
@@ -107,21 +123,7 @@ export default {
     },
     changeSectionTab: function (sectionName) {
       this.section = sectionName
-      switch (this.section) {
-        case 'study':
-          this.displayedList = this.studyList
-          break
-        case 'leadersGuide':
-          this.displayedList = this.leadersGuideList
-          break
-        case 'ideaBox':
-          this.displayedList = this.ideaBoxList
-          break
-        case 'reviewCards':
-          this.displayedList = this.reviewCardsList
-          break
-        default:
-      }
+      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
     },
     goToAdd: function () {
       this.$router.push({ name: 'add', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
