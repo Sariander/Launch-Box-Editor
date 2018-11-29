@@ -98,7 +98,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .md-app {
   height: 100vh;
   max-height: 100vh;
@@ -111,5 +111,9 @@ export default {
 
 .md-app-content {
   padding: 0px;
+}
+
+.orange-hightlight-text {
+  color: orange
 }
 </style>

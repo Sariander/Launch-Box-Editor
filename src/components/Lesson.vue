@@ -15,8 +15,8 @@
       <div v-for="(item, index) of displayedList" :key="item['.key']">
         <div v-on:click="goToEdit(item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
           <template v-if="item.type == 'text'">
-            <div v-bind:class="item.style">{{ item.header }}</div>
-            <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
+            <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights)">{{ item.header }}</div>
+            <div v-if="item.style == 'detail' && item.details && item.details != ''" v-html="highlight(item.details, item.detailsHighlights)">{{ item.details }}</div>
           </template>
           <template v-else-if="item.type == 'video'">
             <div>{{ item.header }}</div>
@@ -62,7 +62,9 @@ export default {
         header: '',
         details: '',
         headerUrls: [''],
-        headerHighlights: ['']
+        headerHighlights: [''],
+        detailsUrls: [''],
+        detailsHighlights: ['']
       }
     }
   },
@@ -92,6 +94,17 @@ export default {
     }
   },
   methods: {
+    highlight (content, highlights) {
+      if (!highlights) {
+        return content
+      }
+      highlights.forEach(function (highlight) {
+        content = content.replace(new RegExp(highlight, 'gi'), match => {
+          return '<span class="orange-hightlight-text">' + match + '</span>'
+        })
+      })
+      return content
+    },
     changeSectionTab: function (sectionName) {
       this.section = sectionName
       switch (this.section) {
@@ -134,10 +147,6 @@ export default {
       this.displayedList.forEach(function (value, index) {
         self.updateItem(value, index)
       })
-    }
-  }
-}
-</script>
     }
   }
 }
