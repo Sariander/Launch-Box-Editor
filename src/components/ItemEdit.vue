@@ -2,7 +2,7 @@
   <div class="lesson">
     <div class="content-container">
       <md-card-actions>
-        <md-button class="md-accent" @click="removeItem(lessonItem)">Remove</md-button>
+        <md-button class="md-accent" @click="removeItem(lessonItem)">Remove Item</md-button>
       </md-card-actions>
       <md-field>
         <label>Header</label>
@@ -103,23 +103,6 @@
           <md-button class="md-primary" @click="addDetailItem()">Save</md-button>
         </md-dialog-actions>
       </md-dialog>
-      <md-speed-dial class="md-bottom-right">
-        <md-speed-dial-target>
-          <md-icon>add</md-icon>
-        </md-speed-dial-target>
-
-        <md-speed-dial-content>
-          <md-button class="md-icon-button" @click="openDetailDialog()">
-            <md-tooltip md-direction="left">Add Detail Highlight</md-tooltip>
-            <md-icon>note</md-icon>
-          </md-button>
-
-          <md-button class="md-icon-button" @click="openHeaderDialog()">
-            <md-tooltip md-direction="left">Add Header Highlight</md-tooltip>
-            <md-icon>event</md-icon>
-          </md-button>
-        </md-speed-dial-content>
-      </md-speed-dial>
     </div>
   </div>
 </template>
@@ -166,7 +149,7 @@ export default {
   },
   methods: {
     cancel: function () {
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
+      this.$router.go(-1)
     },
     addHeaderItem: function () {
       if (!this.lessonItem.headerHighlights) {

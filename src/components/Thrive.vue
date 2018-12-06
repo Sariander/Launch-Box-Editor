@@ -1,5 +1,8 @@
 <template>
   <div class="thrive">
+    <span class=button-container>
+      <md-switch v-model="editMode">Edit</md-switch>
+    </span>
     <div v-for="item of seriesList" :key="item['.key']" class="container" v-on:click="goToSpecificSeries(item['.key'])">
       <img v-bind:src="item.image">
       <div class="centered">{{ item['.key'] }}</div>
@@ -16,12 +19,17 @@ export default {
   },
   data () {
     return {
-      seriesList: []
+      seriesList: [],
+      editMode: false
     }
   },
   methods: {
     goToSpecificSeries: function (seriesName) {
-      this.$router.push({ name: 'series', params: { category: this.category, seriesName: seriesName } })
+      if (this.editMode) {
+        this.$router.push({ name: 'seriesEdit', params: { category: this.category, seriesName: seriesName } })
+      } else {
+        this.$router.push({ name: 'series', params: { category: this.category, seriesName: seriesName } })
+      }
     }
   },
   mounted () {
@@ -41,6 +49,8 @@ export default {
   color: white;
   margin: auto;
   width: 35%;
+  cursor: pointer;
+  user-select: none;
 }
 
 .container img {
@@ -48,7 +58,7 @@ export default {
   filter: brightness(75%);
   margin: 0px 0px 5px;
   object-fit: cover;
-  height: 150px
+  height: 150px;
 }
 
 .centered {
@@ -58,6 +68,9 @@ export default {
   font-size: 1.35em;
   text-align: center;
   width: 100%;
-  user-select: none;
+}
+
+.button-container {
+  float: right;
 }
 </style>

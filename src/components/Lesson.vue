@@ -6,10 +6,10 @@
       <md-tab id="idea" :to="ideaRoute" replace md-label="Idea Box"></md-tab>
       <md-tab id="review" :to="reviewRoute" replace md-label="Review Cards"></md-tab>
     </md-tabs>
-    <md-dialog-actions>
+    <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
-      <md-button class="md-primary" @click="updateList()">Save</md-button>
-    </md-dialog-actions>
+      <md-button class="md-primary" @click="updateList()">Save Order</md-button>
+    </span>
 
     <draggable v-model="displayedList" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="(item, index) of displayedList" :key="item['.key']">
@@ -126,11 +126,11 @@ export default {
       this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
     },
     goToAdd: function () {
-      this.$router.push({ name: 'add', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
+      this.$router.push({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
     },
     goToEdit (key) {
       if (!this.canDrag) {
-        this.$router.push({ name: 'edit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
+        this.$router.push({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
       }
     },
     updateItem: function (item, index) {
@@ -187,5 +187,8 @@ export default {
   width: 60%;
   padding-left: 10px;
   padding-right: 10px;
+}
+.button-container {
+  float: right;
 }
 </style>

@@ -7,6 +7,10 @@ import Series from '@/components/Series'
 import Lesson from '@/components/Lesson'
 import ItemEdit from '@/components/ItemEdit'
 import ItemAdd from '@/components/ItemAdd'
+import SeriesAdd from '@/components/SeriesAdd'
+import SeriesEdit from '@/components/SeriesEdit'
+import LessonAdd from '@/components/LessonAdd'
+import LessonEdit from '@/components/LessonEdit'
 
 Vue.use(Router)
 
@@ -30,9 +34,33 @@ export default new Router({
       props: true
     },
     {
+      path: '/:category/add',
+      name: 'seriesAdd',
+      component: SeriesAdd,
+      props: true
+    },
+    {
+      path: '/:category/:seriesName/edit',
+      name: 'seriesEdit',
+      component: SeriesEdit,
+      props: true
+    },
+    {
       path: '/:category/:seriesName',
       name: 'series',
       component: Series,
+      props: true
+    },
+    {
+      path: '/:category/:seriesName/add',
+      name: 'lessonAdd',
+      component: LessonAdd,
+      props: true
+    },
+    {
+      path: '/:category/:seriesName/:lessonName/edit',
+      name: 'lessonEdit',
+      component: LessonEdit,
       props: true
     },
     {
@@ -43,13 +71,13 @@ export default new Router({
     },
     {
       path: '/:category/:seriesName/:lessonName/:sectionName/edit/:lessonItemKey',
-      name: 'edit',
+      name: 'itemEdit',
       component: ItemEdit,
       props: true
     },
     {
       path: '/:category/:seriesName/:lessonName/:sectionName/add/',
-      name: 'add',
+      name: 'itemAdd',
       component: ItemAdd,
       props: true
     }

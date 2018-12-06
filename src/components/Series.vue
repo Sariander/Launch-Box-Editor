@@ -1,5 +1,8 @@
 <template>
   <div class="series">
+    <span class=button-container>
+      <md-switch v-model="editMode">Edit</md-switch>
+    </span>
     <div class="video-container">
       <img v-bind:src="lesson.video">
     </div>
@@ -17,9 +20,18 @@ export default {
     category: String,
     seriesName: String
   },
+  data () {
+    return {
+      editMode: false
+    }
+  },
   methods: {
     goToSpecificLesson (lessonName) {
-      this.$router.push({name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: lessonName, section: 'study' }})
+      if (this.editMode) {
+        this.$router.push({name: 'lessonEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: lessonName }})
+      } else {
+        this.$router.push({name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: lessonName, section: 'study' }})
+      }
     }
   },
   firebase () {
@@ -40,6 +52,8 @@ export default {
   text-align: center;
   width: 35%;
   margin: auto;
+  cursor: pointer;
+  user-select: none;
 }
 
 .container img {
@@ -53,6 +67,7 @@ export default {
   text-align: center;
   width: 35%;
   margin: auto;
+  user-select: none;
 }
 
 .video-container img {
@@ -67,5 +82,9 @@ export default {
   font-size: 1.35em;
   text-align: center;
   width: 100%;
+}
+
+.button-container {
+  float: right;
 }
 </style>

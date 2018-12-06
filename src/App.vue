@@ -2,7 +2,9 @@
   <div id="app">
     <md-app md-mode="fixed">
       <md-app-toolbar class="md-primary">
-        <span class="md-title">{{ title }}</span>
+        <span style="flex: 1" class="md-title">{{ title }}</span>
+        <md-button v-if="seriesView" @click="addSeries()">Add Series</md-button>
+        <md-button v-if="lessonView" @click="addLesson()">Add Lesson</md-button>
       </md-app-toolbar>
 
       <md-app-drawer md-permanent="full">
@@ -87,7 +89,9 @@ export default {
           route: 'thrive',
           icon: 'looks_3'
         }
-      ]
+      ],
+      lessonView: false,
+      seriesView: false
     }
   },
   mounted () {
@@ -99,10 +103,21 @@ export default {
     }
   },
   methods: {
+    addSeries () {
+      let category = this.$route.params.category
+      this.$router.push({ name: 'seriesAdd', params: { category: category } })
+    },
+    addLesson () {
+      let category = this.$route.params.category
+      let series = this.$route.params.seriesName
+      this.$router.push({ name: 'lessonAdd', params: { category: category, seriesName: series } })
+    },
     navigateToTab (route, text) {
       this.$router.push({ name: route, params: { category: text } })
     },
     setTitle (route) {
+      this.lessonView = false
+      this.seriesView = false
       switch (route.name) {
         case 'Home':
           this.title = 'Thrive Studies'
@@ -111,18 +126,36 @@ export default {
           this.title = 'Follow Up'
           break
         case 'thrive':
+          this.seriesView = true
           this.title = route.params.category
           break
+        case 'seriesEdit':
+          this.seriesView = true
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Edit'
+          break
+        case 'seriesAdd':
+          this.seriesView = true
+          this.title = route.params.category + ' / Add'
+          break
         case 'series':
+          this.lessonView = true
           this.title = route.params.category + ' / ' + route.params.seriesName
+          break
+        case 'lessonEdit':
+          this.lessonView = true
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Edit'
+          break
+        case 'lessonAdd':
+          this.lessonView = true
+          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Add'
           break
         case 'lesson':
           this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName
           break
-        case 'edit':
+        case 'itemEdit':
           this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Edit'
           break
-        case 'add':
+        case 'itemAdd':
           this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Add'
           break
         default:
