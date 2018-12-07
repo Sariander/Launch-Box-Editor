@@ -30,10 +30,10 @@
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
-        <md-speed-dial-target @click="goToAdd()">
-          <md-icon>add</md-icon>
-        </md-speed-dial-target>
-      </md-speed-dial>
+      <md-speed-dial-target @click="goToAdd()">
+        <md-icon>add</md-icon>
+      </md-speed-dial-target>
+    </md-speed-dial>
   </div>
 </template>
 
@@ -57,15 +57,6 @@ export default {
       canDrag: false,
       lessonItems: [],
       displayedList: [],
-      showDialog: false,
-      activeEditItem: {
-        header: '',
-        details: '',
-        headerUrls: [''],
-        headerHighlights: [''],
-        detailsUrls: [''],
-        detailsHighlights: ['']
-      },
       studyRoute: '',
       leaderRoute: '',
       ideaRoute: '',
@@ -138,7 +129,8 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      if (this.sectionName === 'reviewCards') {
+      console.log(index)
+      if (this.section === 'reviewCards') {
         db.ref('series').child(this.category).child(this.seriesName).child(this.section).child(item['.key']).set(copy)
       } else {
         db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).child(index).set(copy)
@@ -147,7 +139,7 @@ export default {
     updateList: function () {
       let self = this
       this.displayedList.forEach(function (value, index) {
-        self.updateItem(value, index)
+        self.updateItem(value, value['.key'])
       })
     }
   }

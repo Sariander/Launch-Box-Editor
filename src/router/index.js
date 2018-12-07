@@ -11,6 +11,9 @@ import SeriesAdd from '@/components/SeriesAdd'
 import SeriesEdit from '@/components/SeriesEdit'
 import LessonAdd from '@/components/LessonAdd'
 import LessonEdit from '@/components/LessonEdit'
+import Section from '@/components/Section'
+import SectionEdit from '@/components/SectionEdit'
+import SectionAdd from '@/components/SectionAdd'
 
 Vue.use(Router)
 
@@ -21,6 +24,24 @@ export default new Router({
       name: 'Home',
       component: Home,
       alias: '/home'
+    },
+    {
+      path: '/:sectionName',
+      name: 'section',
+      component: Section,
+      props: true
+    },
+    {
+      path: '/:sectionName/:sectionItemKey/edit',
+      name: 'sectionEdit',
+      component: SectionEdit,
+      props: true
+    },
+    {
+      path: '/:sectionName/add',
+      name: 'sectionAdd',
+      component: SectionAdd,
+      props: true
     },
     {
       path: '/FollowUp',
