@@ -1,16 +1,9 @@
 <template>
-  <div class="lessonEdit">
+  <div class="lessonAdd">
       <div class="content-container">
-        <md-card-actions>
-          <md-button class="md-accent" @click="removeLesson(lessonItem)">Remove Lesson</md-button>
-        </md-card-actions>
         <md-field>
           <label>Lesson Title</label>
           <md-input v-model="lessonItem.title"></md-input>
-        </md-field>
-        <md-field>
-          <label>Lesson Number</label>
-          <md-input v-model="lessonItem.lesson"></md-input>
         </md-field>
         <md-field>
           <label>Lesson Image</label>
@@ -18,7 +11,7 @@
         </md-field>
         <md-card-actions>
           <md-button class="md-primary" @click="cancel()">Cancel</md-button>
-          <md-button class="md-primary" @click="updateLesson(lessonItem)">Save</md-button>
+          <md-button class="md-primary" @click="addLesson(lessonItem)">Add</md-button>
         </md-card-actions>
       </div>
   </div>
@@ -31,36 +24,27 @@ export default {
   props: {
     category: String,
     seriesName: String,
-    lessonName: String
+    lesson: Number
   },
   data () {
     return {
       lessonItem: {
         title: '',
         image: '',
-        lesson: ''
+        lesson: this.lesson
       }
     }
   },
   methods: {
-    updateLesson: function (item) {
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).set(copy)
-      this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
-    },
-    removeLesson: function (item) {
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).remove()
+    addLesson: function (item) {
+      let key = this.lessonItem.title
+      key = key.replace(/\s+/g, '-').toLowerCase()
+      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(key).set(item)
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },
     cancel: function () {
       this.$router.go(-1)
     }
-  },
-  mounted () {
-    this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName))
   }
 }
 </script>

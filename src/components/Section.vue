@@ -2,13 +2,12 @@
   <div class="home">
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
-      <md-button class="md-primary" @click="updateList()">Save Order</md-button>
       <br>
       <md-switch v-model="canNavigate">Navigate</md-switch>
     </span>
     <div class="content-container">
-    <draggable v-model="sectionList" :options="{disabled: !canDrag}" class="content-container">
-      <div v-for="(item, index) of sectionList" :key="item['.key']">
+    <draggable v-model="sectionListSorted" :options="{disabled: !canDrag}" class="content-container">
+      <div v-for="(item, index) of sectionListSorted" :key="item['.key']">
         <div v-on:click="goToSectionOrEdit(item.sectionName, item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
           <template v-if="item.type == 'text'">
             <div v-bind:class="item.style">{{ item.header }}</div>
@@ -61,9 +60,29 @@ export default {
       sectionList: []
     }
   },
+  computed: {
+    sectionListSorted: {
+      get () {
+        let sorted = [...this.sectionList]
+
+        return sorted
+      },
+      set (value) {
+        let updates = {}
+
+        value.forEach((item, index) => {
+          db.ref(this.sectionName).child('items').on('value', function (snapshot) {
+            updates[item['.key'] + '/order'] = index
+          })
+        })
+
+        db.ref(this.sectionName).child('items').update(updates)
+      }
+    }
+  },
   mounted () {
     this.$watch('sectionName', () => {
-      this.$bindAsArray('sectionList', db.ref(this.sectionName).child('items'))
+      this.$bindAsArray('sectionList', db.ref(this.sectionName).child('items').orderByChild('order'))
     }, {
       immediate: true
     })
@@ -84,19 +103,6 @@ export default {
     },
     goToAdd: function () {
       this.$router.push({name: 'sectionAdd', params: { sectionName: this.sectionName }})
-    },
-    updateItem: function (item, index) {
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      db.ref(this.sectionName).child('items').child(index).set(copy)
-    },
-    updateList: function () {
-      let self = this
-      this.sectionList.forEach(function (value, index) {
-        self.updateItem(value, index)
-      })
     }
   }
 }

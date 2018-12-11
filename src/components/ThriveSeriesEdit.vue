@@ -1,21 +1,12 @@
 <template>
   <div class="seriesAdd">
     <div class="content-container">
-    <md-field>
+      <md-card-actions>
+        <md-button class="md-accent" @click="removeSeries(seriesItem)">Remove Series</md-button>
+      </md-card-actions>
+      <md-field>
         <label>Series Title</label>
         <md-input v-model="seriesItem.title"></md-input>
-      </md-field>
-      <md-field>
-        <label for="category">Category</label>
-        <md-select v-model="seriesItem.category" name="category" id="category">
-          <md-option value="thrive 1">Thrive 1</md-option>
-          <md-option value="thrive 2">Thrive 2</md-option>
-          <md-option value="thrive 3">Thrive 3</md-option>
-        </md-select>
-      </md-field>
-      <md-field>
-        <label>Series Order</label>
-        <md-input v-model="seriesItem.order"></md-input>
       </md-field>
       <md-field>
         <label>Series Header Image Url</label>
@@ -26,12 +17,12 @@
         <md-input v-model="seriesItem.video"></md-input>
       </md-field>
       <md-field>
-        <label>Series Summary</label>
+        <label>Summary</label>
         <md-textarea v-model="seriesItem.summary"></md-textarea>
       </md-field>
       <md-card-actions>
         <md-button class="md-primary" @click="cancel()">Cancel</md-button>
-        <md-button class="md-primary" @click="addSeries(seriesItem)">Add</md-button>
+        <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
     </div>
   </div>
@@ -42,7 +33,8 @@ import { db } from '../config/db'
 
 export default {
   props: {
-    category: String
+    category: String,
+    seriesName: String
   },
   data () {
     return {
@@ -57,15 +49,24 @@ export default {
     }
   },
   methods: {
-    addSeries: function (item) {
-      let key = this.seriesItem.title
-      key = key.replace(/\s+/g, '-').toLowerCase()
-      db.ref('series').child(this.category).child(key).set(item)
+    updateSeries: function (item) {
+      // create a copy of the item
+      const copy = { ...item }
+      // remove the .key attribute
+      delete copy['.key']
+      db.ref('series').child(this.category).child(this.seriesName).set(copy)
+      this.$router.push({ name: 'thrive', params: { category: this.category } })
+    },
+    removeSeries: function (item) {
+      db.ref('series').child(this.category).child(this.seriesName).remove()
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     cancel: function () {
       this.$router.go(-1)
     }
+  },
+  mounted () {
+    this.$bindAsObject('seriesItem', db.ref('series').child(this.category).child(this.seriesName))
   }
 }
 </script>

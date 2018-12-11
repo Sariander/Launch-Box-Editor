@@ -1,6 +1,14 @@
 <template>
   <div class="lesson">
     <div class="content-container">
+      <md-field v-if="lessonItem.type">
+        <label for="type">Type</label>
+        <md-select v-model="lessonItem.type" name="type" id="type">
+          <md-option value="text">Text</md-option>
+          <md-option value="video">Video</md-option>
+          <md-option value="image">Image</md-option>
+        </md-select>
+      </md-field>
       <md-field>
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
@@ -49,14 +57,6 @@
           <md-button class="md-accent" @click="removeDetailItem(index)">Remove</md-button>
         </md-card-actions>
       </span>
-      <md-field v-if="lessonItem.type">
-        <label for="type">Type</label>
-        <md-select v-model="lessonItem.type" name="type" id="type">
-          <md-option value="text">Text</md-option>
-          <md-option value="video">Video</md-option>
-          <md-option value="image">Image</md-option>
-        </md-select>
-      </md-field>
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="lessonItem.style" name="style" id="style">
@@ -112,7 +112,8 @@ export default {
     category: String,
     seriesName: String,
     lessonName: String,
-    sectionName: String
+    sectionName: String,
+    order: Number
   },
   data () {
     return {
@@ -130,7 +131,8 @@ export default {
         headerUrls: [],
         headerHighlights: [],
         detailsHighlights: [],
-        detailsUrls: []
+        detailsUrls: [],
+        order: this.order
       }
     }
   },
@@ -228,6 +230,7 @@ export default {
 .content-container {
   width: 80%;
   margin: 0 auto;
+  padding-top: 10px;
 }
 .material-divider {
   display: block;

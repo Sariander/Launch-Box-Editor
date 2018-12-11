@@ -1,23 +1,75 @@
 <template>
   <div class="lessonAdd">
-      <div class="content-container">
-        <md-field>
-          <label>Lesson Title</label>
-          <md-input v-model="lessonItem.title"></md-input>
-        </md-field>
-        <md-field>
-          <label>Lesson Number</label>
-          <md-input v-model="lessonItem.lesson"></md-input>
-        </md-field>
-        <md-field>
-          <label>Lesson Image</label>
-          <md-input v-model="lessonItem.image"></md-input>
-        </md-field>
-        <md-card-actions>
-          <md-button class="md-primary" @click="cancel()">Cancel</md-button>
-          <md-button class="md-primary" @click="addLesson(lessonItem)">Add</md-button>
-        </md-card-actions>
-      </div>
+    <div class="content-container">
+      <md-field>
+        <label for="type">Type</label>
+        <md-select v-model="sectionItem.type" name="type" id="type">
+          <md-option value="section">Section</md-option>
+          <md-option value="text">Text</md-option>
+          <md-option value="video">Video</md-option>
+          <md-option value="image">Image</md-option>
+          <md-option value="link">Link</md-option>
+          <md-option value="setting">Setting</md-option>
+        </md-select>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Header</label>
+        <md-input v-model="sectionItem.sectionHeader"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Title</label>
+        <md-input v-model="sectionItem.sectionTitle"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Name</label>
+        <md-input v-model="sectionItem.sectionName"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'text'">
+        <label>Header</label>
+        <md-input v-model="sectionItem.header"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'text'">
+        <label>Details</label>
+        <md-input v-model="sectionItem.details"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'video'">
+        <label>Video Url</label>
+        <md-input v-model="sectionItem.url"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'image'">
+        <label>Image Url</label>
+        <md-input v-model="sectionItem.url"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'link'">
+        <label>Link Header</label>
+        <md-input v-model="sectionItem.sectionHeader"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'link'">
+        <label>Link Url</label>
+        <md-input v-model="sectionItem.linkUrl"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'setting'">
+        <label>Setting Title</label>
+        <md-input v-model="sectionItem.title"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'setting'">
+        <label>Setting Key</label>
+        <md-input v-model="sectionItem.key"></md-input>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'text'">
+        <label for="style">Style</label>
+        <md-select v-model="sectionItem.style" name="style" id="style">
+          <md-option value="regular">Regular Header</md-option>
+          <md-option value="bold">Bold Header</md-option>
+          <md-option value="detail">Header and Details</md-option>
+          <md-option value="orange">Orange Header</md-option>
+        </md-select>
+      </md-field>
+      <md-card-actions>
+        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button class="md-primary" @click="addItem(sectionItem)">Add</md-button>
+      </md-card-actions>
+    </div>
   </div>
 </template>
 
@@ -31,19 +83,20 @@ export default {
   },
   data () {
     return {
-      lessonItem: {
+      sectionItem: {
         title: '',
         image: '',
-        lesson: ''
+        lesson: '',
+        type: 'section'
       }
     }
   },
   methods: {
-    addLesson: function (item) {
-      let key = this.lessonItem.title
-      key = key.replace(/\s+/g, '-').toLowerCase()
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(key).set(item)
-      this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
+    addItem: function (item) {
+      // let key = this.lessonItem.title
+      // key = key.replace(/\s+/g, '-').toLowerCase()
+      db.ref(this.sectionName).child('items').push(item)
+      this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
     },
     cancel: function () {
       this.$router.go(-1)
@@ -90,5 +143,6 @@ export default {
 .content-container {
   width: 80%;
   margin: 0 auto;
+  padding-top: 10px;
 }
 </style>

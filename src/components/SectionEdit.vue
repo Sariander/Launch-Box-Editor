@@ -7,34 +7,6 @@
           @click="removeItem(sectionItem)"
         >Remove Item</md-button>
       </md-card-actions>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Header</label>
-        <md-textarea v-model="sectionItem.sectionHeader"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Title</label>
-        <md-textarea v-model="sectionItem.sectionTitle"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Name</label>
-        <md-textarea v-model="sectionItem.sectionName"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'text'">
-        <label>Header</label>
-        <md-textarea v-model="sectionItem.header"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'text'">
-        <label>Details</label>
-        <md-textarea v-model="sectionItem.details"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'video'">
-        <label>Video Url</label>
-        <md-textarea v-model="sectionItem.url"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'image'">
-        <label>Image Url</label>
-        <md-textarea v-model="sectionItem.url"></md-textarea>
-      </md-field>
       <md-field>
         <label for="type">Type</label>
         <md-select v-model="sectionItem.type" name="type" id="type">
@@ -42,8 +14,17 @@
           <md-option value="text">Text</md-option>
           <md-option value="video">Video</md-option>
           <md-option value="image">Image</md-option>
+          <md-option value="link">Link</md-option>
           <md-option value="setting">Setting</md-option>
         </md-select>
+      </md-field>
+      <md-field>
+        <label>Header</label>
+        <md-textarea v-model="sectionItem.header"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'text'">
+        <label>Details</label>
+        <md-textarea v-model="sectionItem.details"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'text'">
         <label for="style">Style</label>
@@ -53,6 +34,26 @@
           <md-option value="detail">Header and Details</md-option>
           <md-option value="orange">Orange Header</md-option>
         </md-select>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'video'">
+        <label>Video Url</label>
+        <md-textarea v-model="sectionItem.url"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'image'">
+        <label>Image Url</label>
+        <md-textarea v-model="sectionItem.url"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'link'">
+        <label>Link Url</label>
+        <md-textarea v-model="sectionItem.linkUrl"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'setting'">
+        <label>Setting Title</label>
+        <md-textarea v-model="sectionItem.title"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'setting'">
+        <label>Setting Key</label>
+        <md-textarea v-model="sectionItem.key"></md-textarea>
       </md-field>
       <md-card-actions>
         <md-button
@@ -146,5 +147,6 @@ export default {
 .content-container {
   width: 80%;
   margin: 0 auto;
+  padding-top: 10px;
 }
 </style>

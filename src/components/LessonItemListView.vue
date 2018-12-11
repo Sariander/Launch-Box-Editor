@@ -8,11 +8,10 @@
     </md-tabs>
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
-      <md-button class="md-primary" @click="updateList()">Save Order</md-button>
     </span>
 
-    <draggable v-model="displayedList" :options="{disabled: !canDrag}" class="content-container">
-      <div v-for="(item, index) of displayedList" :key="item['.key']">
+    <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
+      <div v-for="(item, index) of displayListSorted" :key="item['.key']">
         <div v-on:click="goToEdit(item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
           <template v-if="item.type == 'text'">
             <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights)">{{ item.header }}</div>
@@ -32,6 +31,7 @@
     <md-speed-dial class="md-bottom-right">
       <md-speed-dial-target @click="goToAdd()">
         <md-icon>add</md-icon>
+        <md-tooltip md-direction="left">Add Item</md-tooltip>
       </md-speed-dial-target>
     </md-speed-dial>
   </div>
@@ -63,12 +63,40 @@ export default {
       reviewRoute: ''
     }
   },
+  computed: {
+    displayListSorted: {
+      get () {
+        let sorted = [...this.displayedList]
+
+        return sorted
+      },
+      set (value) {
+        let updates = {}
+        value.forEach((item, index) => {
+          if (this.section === 'reviewCards') {
+            db.ref('series').child(this.category).child(this.seriesName).child(this.section).on('value', function (snapshot) {
+              updates[item['.key'] + '/order'] = index
+            })
+          } else {
+            db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).on('value', function (snapshot) {
+              updates[item['.key'] + '/order'] = index
+            })
+          }
+        })
+        if (this.section === 'reviewCards') {
+          db.ref('series').child(this.category).child(this.seriesName).child(this.section).update(updates)
+        } else {
+          db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).update(updates)
+        }
+      }
+    }
+  },
   firebase () {
     return {
-      studyList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('study'),
-      leadersGuideList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('leadersGuide'),
-      ideaBoxList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('ideaBox'),
-      reviewCardsList: db.ref('series').child(this.category).child(this.seriesName).child('reviewCards')
+      studyList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('study').orderByChild('order'),
+      leadersGuideList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('leadersGuide').orderByChild('order'),
+      ideaBoxList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('ideaBox').orderByChild('order'),
+      reviewCardsList: db.ref('series').child(this.category).child(this.seriesName).child('reviewCards').orderByChild('order')
     }
   },
   mounted () {
@@ -112,35 +140,13 @@ export default {
       })
       return content
     },
-    changeSectionTab: function (sectionName) {
-      this.section = sectionName
-      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
-    },
     goToAdd: function () {
-      this.$router.push({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section } })
+      this.$router.push({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
     },
     goToEdit (key) {
       if (!this.canDrag) {
         this.$router.push({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
       }
-    },
-    updateItem: function (item, index) {
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      console.log(index)
-      if (this.section === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.section).child(item['.key']).set(copy)
-      } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).child(index).set(copy)
-      }
-    },
-    updateList: function () {
-      let self = this
-      this.displayedList.forEach(function (value, index) {
-        self.updateItem(value, value['.key'])
-      })
     }
   }
 }

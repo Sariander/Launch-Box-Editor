@@ -1,16 +1,15 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
-import Thrive from '@/components/Thrive'
-import FollowUp from '@/components/FollowUp'
-import Series from '@/components/Series'
-import Lesson from '@/components/Lesson'
+import Home from '@/components/HomeView'
+import Thrive from '@/components/ThriveCategoryView'
+import Series from '@/components/SeriesListView'
+import Lesson from '@/components/LessonItemListView'
 import ItemEdit from '@/components/ItemEdit'
 import ItemAdd from '@/components/ItemAdd'
-import SeriesAdd from '@/components/SeriesAdd'
-import SeriesEdit from '@/components/SeriesEdit'
-import LessonAdd from '@/components/LessonAdd'
-import LessonEdit from '@/components/LessonEdit'
+import SeriesAdd from '@/components/ThriveSeriesAdd'
+import SeriesEdit from '@/components/ThriveSeriesEdit'
+import LessonAdd from '@/components/SeriesLessonAdd'
+import LessonEdit from '@/components/SeriesLessonEdit'
 import Section from '@/components/Section'
 import SectionEdit from '@/components/SectionEdit'
 import SectionAdd from '@/components/SectionAdd'
@@ -26,27 +25,22 @@ export default new Router({
       alias: '/home'
     },
     {
-      path: '/:sectionName',
+      path: '/section/:sectionName',
       name: 'section',
       component: Section,
       props: true
     },
     {
-      path: '/:sectionName/:sectionItemKey/edit',
+      path: '/section/:sectionName/:sectionItemKey/edit',
       name: 'sectionEdit',
       component: SectionEdit,
       props: true
     },
     {
-      path: '/:sectionName/add',
+      path: '/section/:sectionName/add',
       name: 'sectionAdd',
       component: SectionAdd,
       props: true
-    },
-    {
-      path: '/FollowUp',
-      name: 'followup',
-      component: FollowUp
     },
     {
       path: '/:category',
