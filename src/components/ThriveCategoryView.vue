@@ -8,7 +8,7 @@
     <draggable v-model="seriesListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="item of seriesListSorted" :key="item['.key']" v-bind:class="canDrag ? 'item-drag' : 'item-edit'" class="container" v-on:click="goToSpecificSeries(item['.key'])">
         <img v-bind:src="item.image">
-        <div class="centered">{{ item['.key'] }}</div>
+        <div class="centered">{{ item.title }}</div>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">

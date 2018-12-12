@@ -2,8 +2,7 @@
   <div id="app">
     <md-app md-mode="fixed">
       <md-app-toolbar class="md-primary">
-        <span style="flex: 1" class="md-title">{{ title }}</span>
-        <md-button v-if="sectionAdd" @click="addItem()">Add Item</md-button>
+        <span class="md-title">{{ title }}</span>
       </md-app-toolbar>
 
       <md-app-drawer md-permanent="full">
@@ -12,7 +11,7 @@
         </md-toolbar>
 
         <md-list>
-          <md-list-item v-for="tab in tabs" v-bind:key="tab.id" @click="navigateToTab(tab.route, tab.text)">
+          <md-list-item v-for="tab in tabs" v-bind:key="tab.id" @click="navigateToTab(tab.route, tab.key)">
             <md-icon>{{ tab.icon }}</md-icon>
             <span class="md-list-item-text">{{ tab.text }}</span>
           </md-list-item>
@@ -61,30 +60,35 @@ export default {
         {
           id: 0,
           text: 'Home',
+          key: 'home',
           route: 'Home',
           icon: 'home'
         },
         {
           id: 1,
           text: 'Follow Up',
+          key: 'follow-up',
           route: 'thrive',
           icon: 'list'
         },
         {
           id: 2,
           text: 'Thrive 1',
+          key: 'thrive-1',
           route: 'thrive',
           icon: 'looks_one'
         },
         {
           id: 3,
           text: 'Thrive 2',
+          key: 'thrive-2',
           route: 'thrive',
           icon: 'looks_two'
         },
         {
           id: 4,
           text: 'Thrive 3',
+          key: 'thrive-3',
           route: 'thrive',
           icon: 'looks_3'
         }
@@ -103,12 +107,19 @@ export default {
     }
   },
   methods: {
-    addItem () {
-      let sectionName = this.$route.params.sectionName
-      this.$router.push({ name: 'sectionAdd', params: { sectionName: sectionName } })
+    navigateToTab (route, key) {
+      this.$router.push({ name: route, params: { category: key } })
     },
-    navigateToTab (route, text) {
-      this.$router.push({ name: route, params: { category: text } })
+    convertTitle (str) {
+      str = str.replace(/-/g, ' ')
+      var splitStr = str.toLowerCase().split(' ')
+      for (var i = 0; i < splitStr.length; i++) {
+        // You do not need to check if i is larger than splitStr length, as your for does that for you
+        // Assign it back to the array
+        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1)
+      }
+      // Directly return the joined string
+      return splitStr.join(' ')
     },
     setTitle (route) {
       this.lessonAdd = false
@@ -131,32 +142,32 @@ export default {
           break
         case 'thrive':
           this.seriesAdd = true
-          this.title = route.params.category
+          this.title = this.convertTitle(route.params.category)
           break
         case 'seriesEdit':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Edit Series'
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / Edit Series'
           break
         case 'seriesAdd':
-          this.title = route.params.category + ' / Add Series'
+          this.title = this.convertTitle(route.params.category) + ' / Add Series'
           break
         case 'series':
           this.lessonAdd = true
-          this.title = route.params.category + ' / ' + route.params.seriesName
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName)
           break
         case 'lesson':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName)
           break
         case 'lessonEdit':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Edit Lesson'
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / Edit Lesson'
           break
         case 'lessonAdd':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / Add Lesson'
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / Add Lesson'
           break
         case 'itemEdit':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Edit Item'
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Edit Item'
           break
         case 'itemAdd':
-          this.title = route.params.category + ' / ' + route.params.seriesName + ' / ' + route.params.lessonName + ' / Add Item'
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Add Item'
           break
         default:
       }
