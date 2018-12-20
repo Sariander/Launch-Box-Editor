@@ -67,7 +67,7 @@
         </md-select>
       </md-field>
       <md-card-actions>
-        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="addItem(lessonItem)">Add</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="headerDialogActive">

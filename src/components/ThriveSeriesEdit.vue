@@ -2,7 +2,7 @@
   <div class="seriesAdd">
     <div class="content-container">
       <md-card-actions>
-        <md-button class="md-accent" @click="removeSeries(seriesItem)">Remove Series</md-button>
+        <md-button class="md-accent" @click="confirmDialogActive = true">Remove Series</md-button>
       </md-card-actions>
       <md-field>
         <label>Series Title</label>
@@ -21,9 +21,16 @@
         <md-textarea v-model="seriesItem.summary"></md-textarea>
       </md-field>
       <md-card-actions>
-        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
+      <md-dialog :md-active.sync="confirmDialogActive">
+        <md-dialog-title>Are you sure you want to remove this series?</md-dialog-title>
+        <md-dialog-actions>
+          <md-button @click="confirmDialogActive = false">Cancel</md-button>
+          <md-button class="md-accent" @click="removeSeries()">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
     </div>
   </div>
 </template>
@@ -38,6 +45,7 @@ export default {
   },
   data () {
     return {
+      confirmDialogActive: false,
       seriesItem: {
         title: '',
         image: '',
@@ -57,9 +65,12 @@ export default {
       db.ref('series').child(this.category).child(this.seriesName).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
-    removeSeries: function (item) {
+    removeSeries: function () {
       db.ref('series').child(this.category).child(this.seriesName).remove()
       this.$router.push({ name: 'thrive', params: { category: this.category } })
+    },
+    onCancel: function () {
+
     },
     cancel: function () {
       this.$router.go(-1)

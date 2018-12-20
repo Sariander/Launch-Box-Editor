@@ -43,49 +43,49 @@ export default new Router({
       props: true
     },
     {
-      path: '/:category',
+      path: '/thrive/:category',
       name: 'thrive',
       component: Thrive,
       props: true
     },
     {
-      path: '/:category/add',
+      path: '/thrive/:category/add',
       name: 'seriesAdd',
       component: SeriesAdd,
       props: true
     },
     {
-      path: '/:category/:seriesName/edit',
+      path: '/thrive/:category/:seriesName/edit',
       name: 'seriesEdit',
       component: SeriesEdit,
       props: true
     },
     {
-      path: '/:category/:seriesName',
+      path: '/thrive/:category/:seriesName',
       name: 'series',
       component: Series,
       props: true
     },
     {
-      path: '/:category/:seriesName/add',
+      path: '/thrive/:category/:seriesName/add',
       name: 'lessonAdd',
       component: LessonAdd,
       props: true
     },
     {
-      path: '/:category/:seriesName/:lessonName/edit',
+      path: '/thrive/:category/:seriesName/:lessonName/edit',
       name: 'lessonEdit',
       component: LessonEdit,
       props: true
     },
     {
-      path: '/:category/:seriesName/:lessonName/:section',
+      path: '/thrive/:category/:seriesName/:lessonName/:section',
       name: 'lesson',
       component: Lesson,
       props: true
     },
     {
-      path: '/:category/:seriesName/:lessonName/:sectionName/edit/:lessonItemKey',
+      path: '/thrive/:category/:seriesName/:lessonName/:sectionName/edit/:lessonItemKey',
       name: 'itemEdit',
       component: ItemEdit,
       props: true

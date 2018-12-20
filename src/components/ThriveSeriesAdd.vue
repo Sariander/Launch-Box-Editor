@@ -18,7 +18,7 @@
         <md-textarea v-model="seriesItem.summary"></md-textarea>
       </md-field>
       <md-card-actions>
-        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="addSeries(seriesItem)">Add</md-button>
       </md-card-actions>
     </div>

@@ -66,7 +66,7 @@
         </md-select>
       </md-field>
       <md-card-actions>
-        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="addItem(sectionItem)">Add</md-button>
       </md-card-actions>
     </div>

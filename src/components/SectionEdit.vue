@@ -56,14 +56,8 @@
         <md-textarea v-model="sectionItem.key"></md-textarea>
       </md-field>
       <md-card-actions>
-        <md-button
-          class="md-primary"
-          @click="cancel()"
-        >Cancel</md-button>
-        <md-button
-          class="md-primary"
-          @click="updateItem(sectionItem)"
-        >Save</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
+        <md-button class="md-primary" @click="updateItem(sectionItem)">Save</md-button>
       </md-card-actions>
     </div>
   </div>

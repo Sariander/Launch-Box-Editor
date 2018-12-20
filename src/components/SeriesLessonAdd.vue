@@ -10,7 +10,7 @@
           <md-input v-model="lessonItem.image"></md-input>
         </md-field>
         <md-card-actions>
-          <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+          <md-button @click="cancel()">Cancel</md-button>
           <md-button class="md-primary" @click="addLesson(lessonItem)">Add</md-button>
         </md-card-actions>
       </div>

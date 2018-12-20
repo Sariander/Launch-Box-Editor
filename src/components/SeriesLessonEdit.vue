@@ -2,7 +2,7 @@
   <div class="lessonEdit">
       <div class="content-container">
         <md-card-actions>
-          <md-button class="md-accent" @click="removeLesson(lessonItem)">Remove Lesson</md-button>
+          <md-button class="md-accent" @click="confirmDialogActive = true">Remove Lesson</md-button>
         </md-card-actions>
         <md-field>
           <label>Lesson Title</label>
@@ -13,9 +13,16 @@
           <md-input v-model="lessonItem.image"></md-input>
         </md-field>
         <md-card-actions>
-          <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+          <md-button @click="cancel()">Cancel</md-button>
           <md-button class="md-primary" @click="updateLesson(lessonItem)">Save</md-button>
         </md-card-actions>
+        <md-dialog :md-active.sync="confirmDialogActive">
+        <md-dialog-title>Are you sure you want to remove this lesson?</md-dialog-title>
+        <md-dialog-actions>
+          <md-button @click="confirmDialogActive = false">Cancel</md-button>
+          <md-button class="md-accent" @click="removeLesson()">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
       </div>
   </div>
 </template>
@@ -31,6 +38,7 @@ export default {
   },
   data () {
     return {
+      confirmDialogActive: false,
       lessonItem: {
         title: '',
         image: '',
@@ -47,7 +55,7 @@ export default {
       db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).set(copy)
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },
-    removeLesson: function (item) {
+    removeLesson: function () {
       db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).remove()
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },

@@ -23,7 +23,7 @@
             <div>{{ item.sectionHeader }}</div>
           </template>
           <template v-else-if="item.type == 'video'">
-            <div>{{ item.header }}</div>
+            <div class="bold">{{ item.header }}</div>
             <img v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
           </template>
           <template v-else-if="item.type == 'image'">

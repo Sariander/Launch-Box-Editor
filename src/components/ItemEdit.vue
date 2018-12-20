@@ -2,7 +2,7 @@
   <div class="lesson">
     <div class="content-container">
       <md-card-actions>
-        <md-button class="md-accent" @click="removeItem(lessonItem)">Remove Item</md-button>
+        <md-button class="md-accent" @click="confirmDialogActive = true">Remove Item</md-button>
       </md-card-actions>
       <md-field>
         <label for="type">Type</label>
@@ -70,7 +70,7 @@
         </md-select>
       </md-field>
       <md-card-actions>
-        <md-button class="md-primary" @click="cancel()">Cancel</md-button>
+        <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="updateItem(lessonItem)">Save</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="headerDialogActive">
@@ -103,6 +103,13 @@
           <md-button class="md-primary" @click="addDetailItem()">Save</md-button>
         </md-dialog-actions>
       </md-dialog>
+      <md-dialog :md-active.sync="confirmDialogActive">
+        <md-dialog-title>Are you sure you want to remove this item?</md-dialog-title>
+        <md-dialog-actions>
+          <md-button @click="confirmDialogActive = false">Cancel</md-button>
+          <md-button class="md-accent" @click="removeItem(lessonItem)">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
     </div>
   </div>
 </template>
@@ -120,6 +127,7 @@ export default {
   },
   data () {
     return {
+      confirmDialogActive: false,
       headerDialogActive: false,
       detailDialogActive: false,
       newHeaderHighlight: '',
