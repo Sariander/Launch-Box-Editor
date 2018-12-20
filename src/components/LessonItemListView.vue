@@ -100,10 +100,10 @@ export default {
     }
   },
   mounted () {
-    this.studyRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/study'
-    this.leaderRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/leadersGuide'
-    this.ideaRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/ideaBox'
-    this.reviewRoute = '/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/reviewCards'
+    this.studyRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/study'
+    this.leaderRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/leadersGuide'
+    this.ideaRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/ideaBox'
+    this.reviewRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/reviewCards'
     this.$watch('section', () => {
       switch (this.section) {
         case 'study':
