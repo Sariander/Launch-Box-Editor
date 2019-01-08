@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="section">
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
       <br>
@@ -11,16 +11,16 @@
         <div v-on:click="goToSectionOrEdit(item.sectionName, item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
           <template v-if="item.type == 'text'">
             <div v-bind:class="item.style">{{ item.header }}</div>
-            <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
+            <div v-if="(item.style == 'detail' || item.style == 'detail_orange') && item.details && item.details != ''">{{ item.details }}</div>
           </template>
           <template v-if="item.type == 'setting'">
-            <md-switch>{{ item.title }}</md-switch>
+            <md-switch>{{ item.header }}</md-switch>
           </template>
           <template v-if="item.type == 'section'">
-            <div v-bind:class="'orange'">{{ item.sectionHeader }}</div>
+            <div v-bind:class="'orange'">{{ item.header }}</div>
           </template>
           <template v-if="item.type == 'link'">
-            <div>{{ item.sectionHeader }}</div>
+            <div>{{ item.header }}</div>
           </template>
           <template v-else-if="item.type == 'video'">
             <div class="bold">{{ item.header }}</div>
@@ -102,7 +102,7 @@ export default {
       }
     },
     goToAdd: function () {
-      this.$router.push({name: 'sectionAdd', params: { sectionName: this.sectionName }})
+      this.$router.push({name: 'sectionAdd', params: { sectionName: this.sectionName, order: this.sectionList.length }})
     }
   }
 }
@@ -116,6 +116,10 @@ export default {
   font-weight: bold;
 }
 .orange {
+  color: orange;
+}
+.detail_orange {
+  font-weight: bold;
   color: orange;
 }
 .item-edit {
@@ -139,7 +143,9 @@ export default {
 }
 
 .button-container {
-  float: right;
+  position: fixed;
+  right: 0;
+  top: 64px;
 }
 
 .wide-button {

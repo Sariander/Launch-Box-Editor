@@ -194,22 +194,13 @@ export default {
       this.detailDialogActive = false
     },
     addItem: function (item) {
+      if (this.lessonItem.order === undefined) {
+        this.lessonItem.order = -1
+      }
       if (this.sectionName === 'reviewCards') {
         db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
       } else {
         db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
-      }
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
-    },
-    updateItem: function (item) {
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      if (this.sectionName === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
-      } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).set(copy)
       }
       this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     }

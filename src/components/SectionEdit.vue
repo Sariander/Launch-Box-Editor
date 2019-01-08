@@ -2,10 +2,7 @@
   <div class="sectionEdit">
     <div class="content-container">
       <md-card-actions>
-        <md-button
-          class="md-accent"
-          @click="removeItem(sectionItem)"
-        >Remove Item</md-button>
+        <md-button class="md-accent" @click="confirmDialogActive = true">Remove Item</md-button>
       </md-card-actions>
       <md-field>
         <label for="type">Type</label>
@@ -26,15 +23,6 @@
         <label>Details</label>
         <md-textarea v-model="sectionItem.details"></md-textarea>
       </md-field>
-      <md-field v-if="sectionItem.type == 'text'">
-        <label for="style">Style</label>
-        <md-select v-model="sectionItem.style" name="style" id="style">
-          <md-option value="regular">Regular Header</md-option>
-          <md-option value="bold">Bold Header</md-option>
-          <md-option value="detail">Header and Details</md-option>
-          <md-option value="orange">Orange Header</md-option>
-        </md-select>
-      </md-field>
       <md-field v-if="sectionItem.type == 'video'">
         <label>Video Url</label>
         <md-textarea v-model="sectionItem.url"></md-textarea>
@@ -43,22 +31,39 @@
         <label>Image Url</label>
         <md-textarea v-model="sectionItem.url"></md-textarea>
       </md-field>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Name</label>
+        <md-textarea v-model="sectionItem.sectionName"></md-textarea>
+      </md-field>
       <md-field v-if="sectionItem.type == 'link'">
         <label>Link Url</label>
         <md-textarea v-model="sectionItem.linkUrl"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'setting'">
-        <label>Setting Title</label>
-        <md-textarea v-model="sectionItem.title"></md-textarea>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'setting'">
         <label>Setting Key</label>
         <md-textarea v-model="sectionItem.key"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'text'">
+        <label for="style">Style</label>
+        <md-select v-model="sectionItem.style" name="style" id="style">
+          <md-option value="regular">Regular Header</md-option>
+          <md-option value="bold">Bold Header</md-option>
+          <md-option value="detail">Header and Details</md-option>
+          <md-option value="orange">Orange Header</md-option>
+          <md-option value="detail_orange">Orange Header and Details</md-option>
+        </md-select>
       </md-field>
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="updateItem(sectionItem)">Save</md-button>
       </md-card-actions>
+      <md-dialog :md-active.sync="confirmDialogActive">
+        <md-dialog-title>Are you sure you want to remove this item?</md-dialog-title>
+        <md-dialog-actions>
+          <md-button @click="confirmDialogActive = false">Cancel</md-button>
+          <md-button class="md-accent" @click="removeItem(sectionItem)">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
     </div>
   </div>
 </template>
@@ -73,6 +78,7 @@ export default {
   },
   data () {
     return {
+      confirmDialogActive: false,
       sectionItem: {
         type: '',
         order: '',

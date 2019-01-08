@@ -8,8 +8,8 @@
     </md-tabs>
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
+      <br>
     </span>
-
     <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
         <div v-on:click="goToEdit(item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
@@ -187,6 +187,8 @@ export default {
   padding-right: 10px;
 }
 .button-container {
-  float: right;
+  position: fixed;
+  right: 0;
+  top: 64px;
 }
 </style>

@@ -2,10 +2,12 @@
   <div id="app">
     <md-app md-mode="fixed">
       <md-app-toolbar class="md-primary">
-        <span class="md-title">{{ title }}</span>
+        <span class="md-title" style="flex: 1">{{ title }}</span>
+        <md-button v-if="isLoggedIn" @click="signOut()">Logout</md-button>
+        <md-button v-if="!isLoggedIn" @click="goToSignIn()">Login</md-button>
       </md-app-toolbar>
 
-      <md-app-drawer md-permanent="full">
+      <md-app-drawer v-if="isLoggedIn" md-permanent="full">
         <md-toolbar class="md-transparent" md-elevation="0">
           Navigation
         </md-toolbar>
@@ -30,6 +32,8 @@ import Vue from 'vue'
 import { MdApp, MdList, MdIcon, MdToolbar, MdDrawer, MdButton, MdContent, MdCard, MdRipple, MdProgress, MdBottomBar, MdTabs, MdDialog, MdSpeedDial, MdTooltip, MdField, MdMenu, MdSwitch } from 'vue-material/dist/components'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
+import firebase from 'firebase'
+import store from './config/store'
 
 Vue.use(MdApp)
 Vue.use(MdList)
@@ -52,8 +56,19 @@ Vue.use(MdSwitch)
 
 export default {
   name: 'app',
+  beforeCreate: function () {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.user = user
+        store.commit('login')
+      }
+      this.loading = false
+    })
+  },
   data () {
     return {
+      loading: true,
+      user: null,
       showNavigation: false,
       title: 'Thrive Studies',
       tabs: [
@@ -98,6 +113,11 @@ export default {
       sectionAdd: false
     }
   },
+  computed: {
+    isLoggedIn () {
+      return store.getters.isLoggedIn
+    }
+  },
   mounted () {
     this.setTitle(this.$route)
   },
@@ -107,8 +127,24 @@ export default {
     }
   },
   methods: {
+    signInWithGoogle () {
+      const provider = new firebase.auth.GoogleAuthProvider()
+      firebase.auth().signInWithRedirect(provider).then((result) => {
+        this.user = result.user
+      }).catch(error => console.log(error))
+    },
+    signOut () {
+      firebase.auth().signOut().then(() => {
+        this.user = null
+        store.commit('logout')
+        this.$router.push({ name: 'Login', params: {} })
+      }).catch(error => console.log(error))
+    },
     navigateToTab (route, key) {
       this.$router.push({ name: route, params: { category: key } })
+    },
+    goToSignIn () {
+      this.$router.push({ name: 'Login' })
     },
     convertTitle (str) {
       str = str.replace(/-/g, ' ')
@@ -124,7 +160,8 @@ export default {
       this.sectionAdd = false
       switch (route.name) {
         case 'Home':
-          this.title = 'Thrive Studies'
+        case 'Login':
+          this.title = 'Thrive Studies Editor'
           break
         case 'section':
           this.sectionAdd = true

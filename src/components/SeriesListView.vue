@@ -88,7 +88,7 @@ export default {
 .container {
   position: relative;
   text-align: center;
-  width: 35%;
+  width: 40%;
   margin: auto;
   cursor: pointer;
   user-select: none;
@@ -103,7 +103,7 @@ export default {
 .video-container {
   position: relative;
   text-align: center;
-  width: 35%;
+  width: 40%;
   margin: auto;
   user-select: none;
 }
@@ -130,6 +130,8 @@ export default {
 }
 
 .button-container {
-  float: right;
+  position: fixed;
+  right: 0;
+  top: 64px;
 }
 </style>

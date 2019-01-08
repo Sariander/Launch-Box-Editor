@@ -22,6 +22,7 @@
       </md-field>
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
+        <md-button class="md-primary" @click="showCategoryDialog()">Change Category</md-button>
         <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="confirmDialogActive">
@@ -29,6 +30,24 @@
         <md-dialog-actions>
           <md-button @click="confirmDialogActive = false">Cancel</md-button>
           <md-button class="md-accent" @click="removeSeries()">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
+      <md-dialog :md-active.sync="changeDialogActive">
+        <md-dialog-title>Change the category of this series</md-dialog-title>
+        <md-dialog-content>
+          <md-field>
+            <label for="category">Category</label>
+              <md-select v-model="tempCategory" name="category" id="category">
+                <md-option value="follow-up">Follow Up</md-option>
+                <md-option value="thrive-1">Thrive 1</md-option>
+                <md-option value="thrive-2">Thrive 2</md-option>
+                <md-option value="thrive-3">Thrive 3</md-option>
+              </md-select>
+          </md-field>
+        </md-dialog-content>
+        <md-dialog-actions>
+          <md-button @click="changeDialogActive = false">Cancel</md-button>
+          <md-button class="md-primary" @click="changeCategory(seriesItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
     </div>
@@ -46,6 +65,7 @@ export default {
   data () {
     return {
       confirmDialogActive: false,
+      changeDialogActive: false,
       seriesItem: {
         title: '',
         image: '',
@@ -53,7 +73,8 @@ export default {
         category: '',
         order: '',
         summary: ''
-      }
+      },
+      tempCategory: this.category
     }
   },
   methods: {
@@ -69,8 +90,18 @@ export default {
       db.ref('series').child(this.category).child(this.seriesName).remove()
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
-    onCancel: function () {
-
+    showCategoryDialog: function () {
+      this.tempCategory = this.category
+      this.changeDialogActive = true
+    },
+    changeCategory: function (item) {
+      // create a copy of the item
+      const copy = { ...item }
+      // remove the .key attribute
+      delete copy['.key']
+      db.ref('series').child(this.category).child(this.seriesName).remove()
+      db.ref('series').child(this.tempCategory).child(this.seriesName).set(copy)
+      this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
     },
     cancel: function () {
       this.$router.go(-1)

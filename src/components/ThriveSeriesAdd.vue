@@ -47,6 +47,9 @@ export default {
   },
   methods: {
     addSeries: function (item) {
+      if (this.seriesItem.order === undefined) {
+        this.seriesItem.order = -1
+      }
       let key = this.seriesItem.title
       key = key.replace(/\s+/g, '-').toLowerCase()
       db.ref('series').child(this.category).child(key).set(item)

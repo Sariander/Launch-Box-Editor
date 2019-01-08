@@ -1,11 +1,11 @@
 import Firebase from 'firebase'
 var config = {
-  apiKey: 'AIzaSyABwLpcWJbS0aBQQkNWQotkcCZGUAFtncs',
-  authDomain: 'fake-priceless-project.firebaseapp.com',
-  databaseURL: 'https://fake-priceless-project.firebaseio.com',
-  projectId: 'fake-priceless-project',
-  storageBucket: 'fake-priceless-project.appspot.com',
-  messagingSenderId: '315774615792'
+  apiKey: 'AIzaSyDqRadwpsnjIGOlpvYIzW2fUCnmpVtSXbE',
+  authDomain: 'thrive-studies-2-8ddb5.firebaseapp.com',
+  databaseURL: 'https://thrive-studies-2-8ddb5.firebaseio.com',
+  projectId: 'thrive-studies-2-8ddb5',
+  storageBucket: '',
+  messagingSenderId: '125775085187'
 }
 let app = Firebase.initializeApp(config)
 export const db = app.database()

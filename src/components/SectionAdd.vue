@@ -12,49 +12,33 @@
           <md-option value="setting">Setting</md-option>
         </md-select>
       </md-field>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Header</label>
-        <md-input v-model="sectionItem.sectionHeader"></md-input>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Title</label>
-        <md-input v-model="sectionItem.sectionTitle"></md-input>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'section'">
-        <label>Section Name</label>
-        <md-input v-model="sectionItem.sectionName"></md-input>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'text'">
+      <md-field>
         <label>Header</label>
-        <md-input v-model="sectionItem.header"></md-input>
+        <md-textarea v-model="sectionItem.header"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'text'">
         <label>Details</label>
-        <md-input v-model="sectionItem.details"></md-input>
+        <md-textarea v-model="sectionItem.details"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'video'">
         <label>Video Url</label>
-        <md-input v-model="sectionItem.url"></md-input>
+        <md-textarea v-model="sectionItem.url"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'image'">
         <label>Image Url</label>
-        <md-input v-model="sectionItem.url"></md-input>
+        <md-textarea v-model="sectionItem.url"></md-textarea>
       </md-field>
-      <md-field v-if="sectionItem.type == 'link'">
-        <label>Link Header</label>
-        <md-input v-model="sectionItem.sectionHeader"></md-input>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Name</label>
+        <md-textarea v-model="sectionItem.sectionName"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'link'">
         <label>Link Url</label>
-        <md-input v-model="sectionItem.linkUrl"></md-input>
-      </md-field>
-      <md-field v-if="sectionItem.type == 'setting'">
-        <label>Setting Title</label>
-        <md-input v-model="sectionItem.title"></md-input>
+        <md-textarea v-model="sectionItem.linkUrl"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'setting'">
         <label>Setting Key</label>
-        <md-input v-model="sectionItem.key"></md-input>
+        <md-textarea v-model="sectionItem.key"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'text'">
         <label for="style">Style</label>
@@ -63,6 +47,7 @@
           <md-option value="bold">Bold Header</md-option>
           <md-option value="detail">Header and Details</md-option>
           <md-option value="orange">Orange Header</md-option>
+          <md-option value="detail_orange">Orange Header and Details</md-option>
         </md-select>
       </md-field>
       <md-card-actions>
@@ -79,22 +64,23 @@ import { db } from '../config/db'
 export default {
   props: {
     sectionName: String,
-    sectionItemKey: String
+    sectionItemKey: String,
+    order: Number
   },
   data () {
     return {
       sectionItem: {
-        title: '',
-        image: '',
-        lesson: '',
-        type: 'section'
+        header: '',
+        type: 'section',
+        order: this.order
       }
     }
   },
   methods: {
     addItem: function (item) {
-      // let key = this.lessonItem.title
-      // key = key.replace(/\s+/g, '-').toLowerCase()
+      if (this.sectionItem.order === undefined) {
+        this.sectionItem.order = -1
+      }
       db.ref(this.sectionName).child('items').push(item)
       this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
     },

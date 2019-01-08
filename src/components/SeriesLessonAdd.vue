@@ -37,6 +37,9 @@ export default {
   },
   methods: {
     addLesson: function (item) {
+      if (this.lessonItem.lesson === undefined) {
+        this.lessonItem.lesson = -1
+      }
       let key = this.lessonItem.title
       key = key.replace(/\s+/g, '-').toLowerCase()
       db.ref('series').child(this.category).child(this.seriesName).child('studies').child(key).set(item)

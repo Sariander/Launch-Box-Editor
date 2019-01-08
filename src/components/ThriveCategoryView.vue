@@ -1,16 +1,16 @@
 <template>
   <div class="thrive">
-    <span class=button-container>
-      <md-switch v-model="canDrag">Reorder</md-switch>
-      <br>
-      <md-switch v-model="editMode">Edit</md-switch>
-    </span>
     <draggable v-model="seriesListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="item of seriesListSorted" :key="item['.key']" v-bind:class="canDrag ? 'item-drag' : 'item-edit'" class="container" v-on:click="goToSpecificSeries(item['.key'])">
         <img v-bind:src="item.image">
         <div class="centered">{{ item.title }}</div>
       </div>
     </draggable>
+    <span class=button-container>
+      <md-switch v-model="canDrag">Reorder</md-switch>
+      <br>
+      <md-switch v-model="editMode">Edit</md-switch>
+    </span>
     <md-speed-dial class="md-bottom-right">
       <md-speed-dial-target @click="addSeries()">
         <md-tooltip md-direction="left">Add Series</md-tooltip>
@@ -86,7 +86,7 @@ export default {
   text-align: center;
   color: white;
   margin: auto;
-  width: 35%;
+  width: 55%;
   cursor: pointer;
   user-select: none;
 }
@@ -116,6 +116,8 @@ export default {
 }
 
 .button-container {
-  float: right;
+  position: fixed;
+  right: 0;
+  top: 64px;
 }
 </style>
