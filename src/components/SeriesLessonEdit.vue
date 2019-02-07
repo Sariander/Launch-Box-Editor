@@ -29,6 +29,7 @@
 
 <script>
 import { db } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -52,11 +53,11 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).set(copy)
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).set(copy)
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },
     removeLesson: function () {
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).remove()
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).remove()
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },
     cancel: function () {
@@ -64,7 +65,7 @@ export default {
     }
   },
   mounted () {
-    this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName))
+    this.$bindAsObject('lessonItem', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName))
   }
 }
 </script>

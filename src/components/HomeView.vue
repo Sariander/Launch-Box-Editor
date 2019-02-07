@@ -22,7 +22,7 @@ export default {
   },
   firebase () {
     return {
-      seriesList: db.ref('series').child(this.category).orderByChild('order')
+      seriesList: db.ref('en').child('series').child(this.category).orderByChild('order')
     }
   },
   methods: {

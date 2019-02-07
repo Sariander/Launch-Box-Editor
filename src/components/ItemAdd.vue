@@ -106,6 +106,7 @@
 
 <script>
 import { db } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -198,9 +199,9 @@ export default {
         this.lessonItem.order = -1
       }
       if (this.sectionName === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
       } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
       }
       this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     }

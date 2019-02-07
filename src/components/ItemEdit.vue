@@ -28,37 +28,50 @@
         <label>Image Url</label>
         <md-textarea v-model="lessonItem.url"></md-textarea>
       </md-field>
+      <md-card-actions v-if="lessonItem.type == 'image' && !uploadEnd && !uploading">
+        <md-button class="md-primary" @click="selectFile">Upload Image</md-button>
+      </md-card-actions>
+      <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
+      <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
+      <img v-if="uploadEnd" :src="downloadURL" width="50%" />
+      <div v-if="uploadEnd">
+        <md-button class="md-accent" @click="deleteImage()">Delete</md-button>
+      </div>
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openHeaderDialog()">Add Header Highlight</md-button>
       </md-card-actions>
-      <span v-if="lessonItem.type == 'text'" v-for="(item, index) of lessonItem.headerHighlights" :key="item['.key']">
-        <md-field>
-          <label>Header Highlight {{ index + 1 }}</label>
-          <md-input v-model="lessonItem.headerHighlights[index]"></md-input>
-        </md-field>
-        <md-field>
-          <label>Header Url {{ index + 1 }}</label>
-          <md-input v-model="lessonItem.headerUrls[index]"></md-input>
-        </md-field>
-        <md-card-actions>
-          <md-button class="md-accent" @click="removeHeaderItem(index)">Remove</md-button>
-        </md-card-actions>
+      <span v-if="lessonItem.type == 'text'">
+        <span v-for="(item, index) of lessonItem.headerHighlights" :key="item['.key']">
+          <md-field>
+            <label>Header Highlight {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.headerHighlights[index]"></md-input>
+          </md-field>
+          <md-field>
+            <label>Header Url {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.headerUrls[index]"></md-input>
+          </md-field>
+          <md-card-actions>
+            <md-button class="md-accent" @click="removeHeaderItem(index)">Remove</md-button>
+          </md-card-actions>
+        </span>
       </span>
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openDetailDialog()">Add Detail Highlight</md-button>
       </md-card-actions>
-      <span v-if="lessonItem.type == 'text'" v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']">
-        <md-field>
-          <label>Detail Highlight {{ index + 1 }}</label>
-          <md-input v-model="lessonItem.detailsHighlights[index]"></md-input>
-        </md-field>
-        <md-field>
-          <label>Detail Url {{ index + 1 }}</label>
-          <md-input v-model="lessonItem.detailsUrls[index]"></md-input>
-        </md-field>
-        <md-card-actions>
-          <md-button class="md-accent" @click="removeDetailItem(index)">Remove</md-button>
-        </md-card-actions>
+      <span v-if="lessonItem.type == 'text'">
+        <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']">
+          <md-field>
+            <label>Detail Highlight {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.detailsHighlights[index]"></md-input>
+          </md-field>
+          <md-field>
+            <label>Detail Url {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.detailsUrls[index]"></md-input>
+          </md-field>
+          <md-card-actions>
+            <md-button class="md-accent" @click="removeDetailItem(index)">Remove</md-button>
+          </md-card-actions>
+        </span>
       </span>
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
@@ -115,7 +128,8 @@
 </template>
 
 <script>
-import { db } from '../config/db'
+import { db, firestorage } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -127,6 +141,12 @@ export default {
   },
   data () {
     return {
+      progressUpload: 0,
+      fileName: '',
+      uploadTask: '',
+      uploading: false,
+      uploadEnd: false,
+      downloadURL: '',
       confirmDialogActive: false,
       headerDialogActive: false,
       detailDialogActive: false,
@@ -148,17 +168,33 @@ export default {
   mounted () {
     this.$watch('sectionName', () => {
       if (this.sectionName === 'reviewCards') {
-        this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(this.lessonItemKey))
+        this.$bindAsObject('lessonItem', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).child(this.lessonItemKey))
       } else {
-        this.$bindAsObject('lessonItem', db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(this.lessonItemKey))
+        this.$bindAsObject('lessonItem', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(this.lessonItemKey))
       }
     }, {
       immediate: true
     })
   },
+  watch: {
+    uploadTask: function () {
+      this.uploadTask.on('state_changed', sp => {
+        this.progressUpload = Math.floor(sp.bytesTransferred / sp.totalBytes * 100)
+      },
+      null,
+      () => {
+        this.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          this.uploadEnd = true
+          this.downloadURL = downloadURL
+          this.lessonItem.url = this.downloadURL
+          this.$emit('downloadURL', downloadURL)
+        })
+      })
+    }
+  },
   methods: {
     cancel: function () {
-      this.$router.go(-1)
+      this.deleteImage()
     },
     addHeaderItem: function () {
       if (!this.lessonItem.headerHighlights) {
@@ -216,19 +252,52 @@ export default {
       // remove the .key attribute
       delete copy['.key']
       if (this.sectionName === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
       } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).set(copy)
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).set(copy)
       }
       this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     },
     removeItem: function (item) {
       if (this.sectionName === 'reviewCards') {
-        db.ref('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).remove()
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).remove()
       } else {
-        db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).remove()
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).child(item['.key']).remove()
       }
       this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
+    },
+    selectFile () {
+      this.$refs.uploadInput.click()
+    },
+    detectFiles (e) {
+      let fileList = e.target.files || e.dataTransfer.files
+      Array.from(Array(fileList.length).keys()).map(x => {
+        this.upload(fileList[x])
+      })
+    },
+    upload (file) {
+      this.fileName = file.name
+      this.uploading = true
+      this.uploadTask = firestorage.ref(this.seriesName + '/' + this.lessonName + '/' + file.name).put(file)
+    },
+    deleteImage () {
+      if (this.uploadEnd) {
+        firestorage
+          .ref(this.seriesName + '/' + this.lessonName + '/' + this.fileName)
+          .delete()
+          .then(() => {
+            this.uploading = false
+            this.uploadEnd = false
+            this.downloadURL = ''
+            this.lessonItem.url = ''
+            this.$router.go(-1)
+          })
+          .catch((error) => {
+            console.error(`file delete error occured: ${error}`)
+          })
+      } else {
+        this.$router.go(-1)
+      }
     }
   }
 }
@@ -258,5 +327,9 @@ export default {
   width: 60%;
   padding-left: 10px;
   padding-right: 10px;
+}
+input[type="file"] {
+  position: absolute;
+  clip: rect(0,0,0,0);
 }
 </style>

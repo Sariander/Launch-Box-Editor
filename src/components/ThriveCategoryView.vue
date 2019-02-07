@@ -23,6 +23,7 @@
 <script>
 import { db } from '../config/db'
 import draggable from 'vuedraggable'
+import store from '../config/store'
 
 export default {
   components: {
@@ -48,11 +49,11 @@ export default {
       set (value) {
         let updates = {}
         value.forEach((item, index) => {
-          db.ref('series').child(this.category).on('value', function (snapshot) {
+          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).on('value', function (snapshot) {
             updates[item['.key'] + '/order'] = index
           })
         })
-        db.ref('series').child(this.category).update(updates)
+        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).update(updates)
       }
     }
   },
@@ -72,7 +73,7 @@ export default {
   },
   mounted () {
     this.$watch('category', () => {
-      this.$bindAsArray('seriesList', db.ref('series').child(this.category).orderByChild('order'))
+      this.$bindAsArray('seriesList', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).orderByChild('order'))
     }, {
       immediate: true
     })

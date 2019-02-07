@@ -7,10 +7,12 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
-    isLoggedIn: false
+    isLoggedIn: false,
+    activeLanguageCode: 'en'
   },
   getters: {
-    isLoggedIn: state => state.isLoggedIn
+    isLoggedIn: state => state.isLoggedIn,
+    activeLanguageCode: state => state.activeLanguageCode
   },
   mutations: {
     login (state) {
@@ -18,6 +20,9 @@ const store = new Vuex.Store({
     },
     logout (state) {
       state.isLoggedIn = false
+    },
+    setActiveLanguageCode (state, Language) {
+      state.activeLanguageCode = Language
     }
   },
   plugins: [

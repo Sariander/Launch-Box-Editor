@@ -27,6 +27,7 @@
 
 <script>
 import { db } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -52,7 +53,8 @@ export default {
       }
       let key = this.seriesItem.title
       key = key.replace(/\s+/g, '-').toLowerCase()
-      db.ref('series').child(this.category).child(key).set(item)
+      item.category = this.category
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(key).set(item)
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     cancel: function () {

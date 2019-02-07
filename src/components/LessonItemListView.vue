@@ -40,6 +40,7 @@
 <script>
 import { db } from '../config/db'
 import draggable from 'vuedraggable'
+import store from '../config/store'
 
 export default {
   components: {
@@ -74,29 +75,29 @@ export default {
         let updates = {}
         value.forEach((item, index) => {
           if (this.section === 'reviewCards') {
-            db.ref('series').child(this.category).child(this.seriesName).child(this.section).on('value', function (snapshot) {
+            db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.section).on('value', function (snapshot) {
               updates[item['.key'] + '/order'] = index
             })
           } else {
-            db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).on('value', function (snapshot) {
+            db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).on('value', function (snapshot) {
               updates[item['.key'] + '/order'] = index
             })
           }
         })
         if (this.section === 'reviewCards') {
-          db.ref('series').child(this.category).child(this.seriesName).child(this.section).update(updates)
+          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.section).update(updates)
         } else {
-          db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).update(updates)
+          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).update(updates)
         }
       }
     }
   },
   firebase () {
     return {
-      studyList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('study').orderByChild('order'),
-      leadersGuideList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('leadersGuide').orderByChild('order'),
-      ideaBoxList: db.ref('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('ideaBox').orderByChild('order'),
-      reviewCardsList: db.ref('series').child(this.category).child(this.seriesName).child('reviewCards').orderByChild('order')
+      studyList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('study').orderByChild('order'),
+      leadersGuideList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('leadersGuide').orderByChild('order'),
+      ideaBoxList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('ideaBox').orderByChild('order'),
+      reviewCardsList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('reviewCards').orderByChild('order')
     }
   },
   mounted () {

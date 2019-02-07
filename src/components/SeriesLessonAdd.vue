@@ -19,6 +19,7 @@
 
 <script>
 import { db } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -42,7 +43,7 @@ export default {
       }
       let key = this.lessonItem.title
       key = key.replace(/\s+/g, '-').toLowerCase()
-      db.ref('series').child(this.category).child(this.seriesName).child('studies').child(key).set(item)
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(key).set(item)
       this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
     },
     cancel: function () {

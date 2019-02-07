@@ -29,30 +29,13 @@
 
 <script>
 import Vue from 'vue'
-import { MdApp, MdList, MdIcon, MdToolbar, MdDrawer, MdButton, MdContent, MdCard, MdRipple, MdProgress, MdBottomBar, MdTabs, MdDialog, MdSpeedDial, MdTooltip, MdField, MdMenu, MdSwitch } from 'vue-material/dist/components'
+import VueMaterial from 'vue-material'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-material/dist/theme/default.css'
 import firebase from 'firebase'
 import store from './config/store'
 
-Vue.use(MdApp)
-Vue.use(MdList)
-Vue.use(MdIcon)
-Vue.use(MdToolbar)
-Vue.use(MdDrawer)
-Vue.use(MdButton)
-Vue.use(MdContent)
-Vue.use(MdCard)
-Vue.use(MdRipple)
-Vue.use(MdProgress)
-Vue.use(MdBottomBar)
-Vue.use(MdTabs)
-Vue.use(MdDialog)
-Vue.use(MdField)
-Vue.use(MdMenu)
-Vue.use(MdSpeedDial)
-Vue.use(MdTooltip)
-Vue.use(MdSwitch)
+Vue.use(VueMaterial)
 
 export default {
   name: 'app',

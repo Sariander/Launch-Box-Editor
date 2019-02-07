@@ -40,6 +40,21 @@
         <label>Setting Key</label>
         <md-textarea v-model="sectionItem.key"></md-textarea>
       </md-field>
+      <span v-if="sectionItem.type == 'dropdown'">
+        <span v-for="(item, index) of sectionItem.optionNames" :key="item['.key']">
+          <md-field>
+            <label>Option Name {{ index + 1 }}</label>
+            <md-input v-model="sectionItem.optionNames[index]"></md-input>
+          </md-field>
+          <md-field>
+            <label>Option Value {{ index + 1 }}</label>
+            <md-input v-model="sectionItem.optionValues[index]"></md-input>
+          </md-field>
+          <md-card-actions>
+            <md-button class="md-accent" @click="removeOptionItem(index)">Remove</md-button>
+          </md-card-actions>
+        </span>
+      </span>
       <md-field v-if="sectionItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="sectionItem.style" name="style" id="style">
@@ -60,6 +75,7 @@
 
 <script>
 import { db } from '../config/db'
+import store from '../config/store'
 
 export default {
   props: {
@@ -81,7 +97,7 @@ export default {
       if (this.sectionItem.order === undefined) {
         this.sectionItem.order = -1
       }
-      db.ref(this.sectionName).child('items').push(item)
+      db.ref(store.getters.activeLanguageCode).child('section').child(this.sectionName).child('items').push(item)
       this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
     },
     cancel: function () {
