@@ -35,7 +35,7 @@
       <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
       <img v-if="uploadEnd" :src="downloadURL" width="50%" />
       <div v-if="uploadEnd">
-        <md-button class="md-accent" @click="deleteImage()">Delete</md-button>
+        <md-button class="md-accent" @click="deleteImage(false)">Delete</md-button>
       </div>
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openHeaderDialog()">Add Header Highlight</md-button>
@@ -194,7 +194,11 @@ export default {
   },
   methods: {
     cancel: function () {
-      this.deleteImage()
+      if (this.uploadEnd) {
+        this.deleteImage(true)
+      } else {
+        this.$router.go(-1)
+      }
     },
     addHeaderItem: function () {
       if (!this.lessonItem.headerHighlights) {
@@ -251,6 +255,9 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
+      if (copy.type === 'video') {
+        copy.url = this.YouTubeGetID(copy.url)
+      }
       if (this.sectionName === 'reviewCards') {
         db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
       } else {
@@ -280,24 +287,33 @@ export default {
       this.uploading = true
       this.uploadTask = firestorage.ref(this.seriesName + '/' + this.lessonName + '/' + file.name).put(file)
     },
-    deleteImage () {
-      if (this.uploadEnd) {
-        firestorage
-          .ref(this.seriesName + '/' + this.lessonName + '/' + this.fileName)
-          .delete()
-          .then(() => {
-            this.uploading = false
-            this.uploadEnd = false
-            this.downloadURL = ''
-            this.lessonItem.url = ''
+    deleteImage (navigate) {
+      firestorage
+        .ref(this.seriesName + '/' + this.lessonName + '/' + this.fileName)
+        .delete()
+        .then(() => {
+          this.uploading = false
+          this.uploadEnd = false
+          this.downloadURL = ''
+          this.lessonItem.url = ''
+          if (navigate) {
             this.$router.go(-1)
-          })
-          .catch((error) => {
-            console.error(`file delete error occured: ${error}`)
-          })
+          }
+        })
+        .catch((error) => {
+          console.error(`file delete error occured: ${error}`)
+        })
+    },
+    YouTubeGetID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
       } else {
-        this.$router.go(-1)
+        ID = url
       }
+      return ID
     }
   }
 }
