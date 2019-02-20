@@ -5,6 +5,7 @@
         <label for="type">Type</label>
         <md-select v-model="lessonItem.type" name="type" id="type">
           <md-option value="text">Text</md-option>
+          <md-option value="idea">Idea</md-option>
           <md-option value="video">Video</md-option>
           <md-option value="image">Image</md-option>
         </md-select>
@@ -16,6 +17,10 @@
       <md-field v-if="lessonItem.type == 'text'">
         <label>Details</label>
         <md-textarea v-model="lessonItem.details"></md-textarea>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'idea'">
+        <label>Idea Url</label>
+        <md-textarea v-model="lessonItem.url"></md-textarea>
       </md-field>
       <md-field v-if="lessonItem.type == 'video'">
         <label>Video Url</label>
@@ -55,6 +60,8 @@
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openDetailDialog()">Add Detail Highlight</md-button>
       </md-card-actions>
+      <md-switch v-if="lessonItem.type == 'text'" v-model="lessonItem.question" class="md-primary">Question</md-switch>
+      <md-switch v-if="lessonItem.type == 'text'" v-model="lessonItem.expandable" class="md-primary">Expandable</md-switch>
       <span v-if="lessonItem.type == 'text'">
         <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']">
           <md-field>
@@ -70,6 +77,12 @@
           </md-card-actions>
         </span>
       </span>
+      <md-field v-if="lessonItem.type == 'idea'">
+        <label for="ideaStyle">Idea Style</label>
+        <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
+          <md-option value="url">Url</md-option>
+        </md-select>
+      </md-field>
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="lessonItem.style" name="style" id="style">
@@ -144,14 +157,7 @@ export default {
       newDetailHighlight: '',
       newDetailUrl: '',
       lessonItem: {
-        header: '',
-        details: '',
         type: 'text',
-        style: 'regular',
-        headerUrls: [],
-        headerHighlights: [],
-        detailsHighlights: [],
-        detailsUrls: [],
         order: this.order
       }
     }
@@ -231,12 +237,7 @@ export default {
       this.detailDialogActive = false
     },
     addItem: function (item) {
-      if (this.lessonItem.order === undefined) {
-        this.lessonItem.order = -1
-      }
-      if (this.lessonItem.type === 'video') {
-        this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
-      }
+      this.prepareItemForSending()
       if (this.sectionName === 'reviewCards') {
         db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
       } else {
@@ -278,13 +279,43 @@ export default {
     YouTubeGetID (url) {
       var ID = ''
       url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      console.log(url)
       if (url[2] !== undefined) {
         ID = url[2].split(/[^0-9a-z_-]/i)
         ID = ID[0]
+      } else if (url[0] !== undefined) {
+        ID = url[0]
       } else {
         ID = url
       }
       return ID
+    },
+    prepareItemForSending () {
+      if (this.lessonItem.order === undefined) {
+        this.lessonItem.order = -1
+      }
+      this.lessonItem.header = this.lessonItem.header || ''
+      switch (this.lessonItem.type) {
+        case 'text':
+          this.lessonItem.details = this.lessonItem.details || ''
+          this.lessonItem.style = this.lessonItem.style || 'regular'
+          this.lessonItem.question = this.lessonItem.question || false
+          this.lessonItem.expandable = this.lessonItem.expandable || false
+          break
+        case 'idea':
+          this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.ideaStyle = this.lessonItem.ideaStyle || 'url'
+          break
+        case 'video':
+          this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
+          break
+        case 'image':
+          this.lessonItem.url = this.lessonItem.url || ''
+          break
+        default:
+          break
+      }
     }
   }
 }

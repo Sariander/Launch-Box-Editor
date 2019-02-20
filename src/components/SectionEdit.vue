@@ -66,6 +66,7 @@
             <label>Language Code {{ index + 1 }}</label>
             <md-input v-model="sectionItem.optionValues[index]"></md-input>
           </md-field>
+          <md-switch v-model="sectionItem.optionEnabled[index]" class="md-primary">Language Enabled</md-switch>
           <md-card-actions>
             <md-button class="md-accent" @click="removeOptionItem(index)">Remove</md-button>
           </md-card-actions>
@@ -145,11 +146,16 @@ export default {
         this.$set(this.sectionItem, 'optionTitles', [])
       }
       this.sectionItem.optionTitles.push(this.newOptionTitle)
+      if (!this.sectionItem.optionEnabled) {
+        this.$set(this.sectionItem, 'optionEnabled', [])
+      }
+      this.sectionItem.optionEnabled.push(false)
       this.optionDialogActive = false
     },
     removeOptionItem: function (index) {
       this.sectionItem.optionTitles.splice(index, 1)
       this.sectionItem.optionValues.splice(index, 1)
+      this.sectionItem.optionEnabled.splice(index, 1)
     },
     updateItem: function (item) {
       // create a copy of the item

@@ -17,6 +17,9 @@
             <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights)">{{ item.header }}</div>
             <div v-if="item.style == 'detail' && item.details && item.details != ''" v-html="highlight(item.details, item.detailsHighlights)">{{ item.details }}</div>
           </template>
+          <template v-if="item.type == 'idea'">
+            <div class="orange"> {{ item.header }} </div>
+          </template>
           <template v-else-if="item.type == 'video'">
             <div>{{ item.header }}</div>
             <img v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">

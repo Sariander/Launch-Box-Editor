@@ -147,11 +147,14 @@ export default {
           this.title = 'Thrive Studies Editor'
           break
         case 'section':
+          this.title = 'Thrive Studies Editor'
           this.sectionAdd = true
           break
         case 'sectionEdit':
+          this.title = 'Thrive Studies Editor'
           break
         case 'sectionAdd':
+          this.title = 'Thrive Studies Editor'
           break
         case 'followup':
           this.lessonAdd = true

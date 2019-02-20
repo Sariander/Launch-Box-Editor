@@ -81,7 +81,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   position: relative;
   text-align: center;
@@ -90,6 +90,36 @@ export default {
   width: 55%;
   cursor: pointer;
   user-select: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .container {
+    width: 60%;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .container {
+    width: 60%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .container {
+    width: 65%;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .container {
+    width: 70%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .container {
+    width: 70%;
+  }
 }
 
 .container img {

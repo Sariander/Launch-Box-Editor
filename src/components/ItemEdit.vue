@@ -1,5 +1,6 @@
 <template>
   <div class="lesson">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <div class="content-container">
       <md-card-actions>
         <md-button class="md-accent" @click="confirmDialogActive = true">Remove Item</md-button>
@@ -8,6 +9,7 @@
         <label for="type">Type</label>
         <md-select v-model="lessonItem.type" name="type" id="type">
           <md-option value="text">Text</md-option>
+          <md-option value="idea">Idea</md-option>
           <md-option value="video">Video</md-option>
           <md-option value="image">Image</md-option>
         </md-select>
@@ -19,6 +21,10 @@
       <md-field v-if="lessonItem.type == 'text'">
         <label>Details</label>
         <md-textarea v-model="lessonItem.details"></md-textarea>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'idea'">
+        <label>Idea Url</label>
+        <md-textarea v-model="lessonItem.url"></md-textarea>
       </md-field>
       <md-field v-if="lessonItem.type == 'video'">
         <label>Video Url</label>
@@ -73,6 +79,29 @@
           </md-card-actions>
         </span>
       </span>
+      <md-field v-if="lessonItem.type == 'idea'">
+        <label for="ideaStyle">Idea Style</label>
+        <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
+          <md-option value="url">Url</md-option>
+        </md-select>
+      </md-field>
+
+      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
+        <md-switch v-model="lessonItem.question" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Question</md-switch>
+        <span class="md-layout-item md-size-2">
+          <md-icon class="far fa-question-circle"></md-icon>
+          <md-tooltip md-direction="right">Details will be hidden and Details Highlights will be disabled when not in Leader Mode.</md-tooltip>
+        </span>
+      </span>
+
+      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
+        <md-switch v-model="lessonItem.expandable" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Expandable</md-switch>
+        <span class="md-layout-item md-size-2">
+          <md-icon class="far fa-question-circle"></md-icon>
+          <md-tooltip md-direction="right">Expand to view Details will be enabled. All Highlights will be disabled.</md-tooltip>
+        </span>
+      </span>
+
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="lessonItem.style" name="style" id="style">
@@ -158,6 +187,8 @@ export default {
         type: 'text',
         header: '',
         details: '',
+        expandable: false,
+        question: false,
         headerUrls: [],
         headerHighlights: [],
         detailsHighlights: [],
@@ -251,13 +282,11 @@ export default {
       this.detailDialogActive = false
     },
     updateItem: function (item) {
+      this.prepareItemForSending()
       // create a copy of the item
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      if (copy.type === 'video') {
-        copy.url = this.YouTubeGetID(copy.url)
-      }
       if (this.sectionName === 'reviewCards') {
         db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).child(item['.key']).set(copy)
       } else {
@@ -310,10 +339,39 @@ export default {
       if (url[2] !== undefined) {
         ID = url[2].split(/[^0-9a-z_-]/i)
         ID = ID[0]
+      } else if (url[0] !== undefined) {
+        ID = url[0]
       } else {
         ID = url
       }
       return ID
+    },
+    prepareItemForSending () {
+      if (this.lessonItem.order === undefined) {
+        this.lessonItem.order = -1
+      }
+      this.lessonItem.header = this.lessonItem.header || ''
+      switch (this.lessonItem.type) {
+        case 'text':
+          this.lessonItem.details = this.lessonItem.details || ''
+          this.lessonItem.style = this.lessonItem.style || 'regular'
+          this.lessonItem.question = this.lessonItem.question || false
+          this.lessonItem.expandable = this.lessonItem.expandable || false
+          break
+        case 'idea':
+          this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.ideaStyle = this.lessonItem.ideaStyle || 'url'
+          break
+        case 'video':
+          this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
+          break
+        case 'image':
+          this.lessonItem.url = this.lessonItem.url || ''
+          break
+        default:
+          break
+      }
     }
   }
 }
@@ -348,4 +406,15 @@ input[type="file"] {
   position: absolute;
   clip: rect(0,0,0,0);
 }
+
+.md-layout-item.md-size-2 {
+    min-width: 2%;
+    max-width: 2%;
+    flex: 0 1 2%;
+}
+
+.md-tooltip {
+  font-size: 12px;
+}
+
 </style>

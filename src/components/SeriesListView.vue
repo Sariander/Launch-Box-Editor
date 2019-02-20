@@ -95,12 +95,6 @@ export default {
   user-select: none;
 }
 
-.container img {
-  margin: 0px 0px 5px;
-  width: 100%;
-  height: 250px;
-}
-
 .video-container {
   position: relative;
   text-align: center;
@@ -109,9 +103,64 @@ export default {
   user-select: none;
 }
 
+@media only screen and (max-width: 600px) {
+  .container {
+    width: 55%;
+  }
+
+  .video-container {
+    width: 55%;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .container {
+    width: 50%;
+  }
+  .video-container {
+    width: 50%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .container {
+    width: 45%;
+  }
+  .video-container {
+    width: 45%;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .container {
+    width: 40%;
+  }
+  .video-container {
+    width: 40%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .container {
+    width: 35%;
+  }
+  .video-container {
+    width: 35%;
+  }
+}
+
+.container img {
+  margin: 0px 0px 5px;
+  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .video-container img {
   margin: 0px 0px 5px;
   width: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .centered {
