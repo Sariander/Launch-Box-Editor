@@ -46,6 +46,7 @@
     <md-speed-dial class="md-bottom-right">
       <md-speed-dial-target @click="goToAdd()">
         <md-icon>add</md-icon>
+        <md-tooltip md-direction="left">Add Item</md-tooltip>
       </md-speed-dial-target>
     </md-speed-dial>
     </div>

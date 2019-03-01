@@ -1,7 +1,8 @@
 <template>
   <div class="lesson">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <div class="content-container">
-      <md-field v-if="lessonItem.type">
+      <md-field>
         <label for="type">Type</label>
         <md-select v-model="lessonItem.type" name="type" id="type">
           <md-option value="text">Text</md-option>
@@ -14,16 +15,12 @@
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'text'">
+      <md-field v-if="lessonItem.type == 'text' || lessonItem.type == 'idea'">
         <label>Details</label>
         <md-textarea v-model="lessonItem.details"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'idea'">
-        <label>Idea Url</label>
-        <md-textarea v-model="lessonItem.url"></md-textarea>
-      </md-field>
       <md-field v-if="lessonItem.type == 'video'">
-        <label>Video Url</label>
+        <label>Video ID</label>
         <md-textarea v-model="lessonItem.url"></md-textarea>
       </md-field>
       <md-field v-if="lessonItem.type == 'image'">
@@ -60,8 +57,6 @@
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openDetailDialog()">Add Detail Highlight</md-button>
       </md-card-actions>
-      <md-switch v-if="lessonItem.type == 'text'" v-model="lessonItem.question" class="md-primary">Question</md-switch>
-      <md-switch v-if="lessonItem.type == 'text'" v-model="lessonItem.expandable" class="md-primary">Expandable</md-switch>
       <span v-if="lessonItem.type == 'text'">
         <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']">
           <md-field>
@@ -78,11 +73,44 @@
         </span>
       </span>
       <md-field v-if="lessonItem.type == 'idea'">
-        <label for="ideaStyle">Idea Style</label>
+        <label for="ideaStyle">Idea Type</label>
         <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
-          <md-option value="url">Url</md-option>
+          <md-option value="text">Text</md-option>
+          <md-option value="link">Link</md-option>
+          <md-option value="image">Image</md-option>
+          <md-option value="video">Video</md-option>
         </md-select>
       </md-field>
+      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'link'">
+        <label>Link Title</label>
+        <md-input v-model="lessonItem.urlTitle"></md-input>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'link'">
+        <label>Link Url</label>
+        <md-input v-model="lessonItem.url"></md-input>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'image'">
+        <label>Image Url</label>
+        <md-input v-model="lessonItem.url"></md-input>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'video'">
+        <label>Video ID</label>
+        <md-input v-model="lessonItem.url"></md-input>
+      </md-field>
+      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
+        <md-switch v-model="lessonItem.question" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Question</md-switch>
+        <span class="md-layout-item md-size-2">
+          <md-icon class="far fa-question-circle"></md-icon>
+          <md-tooltip md-direction="right">Details will be hidden and Details Highlights will be disabled when not in Leader Mode.</md-tooltip>
+        </span>
+      </span>
+      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
+        <md-switch v-model="lessonItem.expandable" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Expandable</md-switch>
+        <span class="md-layout-item md-size-2">
+          <md-icon class="far fa-question-circle"></md-icon>
+          <md-tooltip md-direction="right">Expand to view Details will be enabled. All Highlights will be disabled.</md-tooltip>
+        </span>
+      </span>
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="lessonItem.style" name="style" id="style">
@@ -305,6 +333,10 @@ export default {
         case 'idea':
           this.lessonItem.url = this.lessonItem.url || ''
           this.lessonItem.ideaStyle = this.lessonItem.ideaStyle || 'url'
+          this.lessonItem.urlTitle = this.lessonItem.urlTitle || ''
+          if (this.lessonItem.ideaStyle === 'video') {
+            this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
+          }
           break
         case 'video':
           this.lessonItem.url = this.lessonItem.url || ''
@@ -349,5 +381,15 @@ export default {
 input[type="file"] {
   position: absolute;
   clip: rect(0,0,0,0);
+}
+
+.md-layout-item.md-size-2 {
+    min-width: 2%;
+    max-width: 2%;
+    flex: 0 1 2%;
+}
+
+.md-tooltip {
+  font-size: 12px;
 }
 </style>
