@@ -1,5 +1,6 @@
 <template>
   <div class="sectionEdit">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <div class="content-container">
       <md-card-actions v-if="sectionItem.type != 'dropdown'">
         <md-button class="md-accent" @click="confirmDialogActive = true">Remove Item</md-button>
@@ -43,6 +44,13 @@
         <label>Setting Key</label>
         <md-textarea v-model="sectionItem.key"></md-textarea>
       </md-field>
+      <span v-if="sectionItem.type == 'text'" class="md-layout md-alignment-center-left">
+        <md-switch v-model="sectionItem.expandable" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Expandable</md-switch>
+        <span class="md-layout-item md-size-2">
+          <md-icon class="far fa-question-circle"></md-icon>
+          <md-tooltip md-direction="right">Expand to view Details will be enabled.</md-tooltip>
+        </span>
+      </span>
       <md-field v-if="sectionItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="sectionItem.style" name="style" id="style">
@@ -232,5 +240,15 @@ export default {
   width: 80%;
   margin: 0 auto;
   padding-top: 10px;
+}
+
+.md-layout-item.md-size-2 {
+    min-width: 2%;
+    max-width: 2%;
+    flex: 0 1 2%;
+}
+
+.md-tooltip {
+  font-size: 12px;
 }
 </style>

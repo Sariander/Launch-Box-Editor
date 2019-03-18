@@ -14,7 +14,7 @@
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
         <div v-on:click="goToEdit(item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
           <template v-if="item.type == 'text'">
-            <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights)">{{ item.header }}</div>
+            <div v-bind:class="item.style" v-html="highlight(item.important ? '*' + item.header : item.header, item.headerHighlights)"></div>
             <div v-if="item.style == 'detail' && item.details && item.details != ''" v-html="highlight(item.details, item.detailsHighlights)">{{ item.details }}</div>
           </template>
           <template v-if="item.type == 'idea'">
@@ -149,11 +149,11 @@ export default {
       return content
     },
     goToAdd: function () {
-      this.$router.push({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
+      this.$router.replace({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
     },
     goToEdit (key) {
       if (!this.canDrag) {
-        this.$router.push({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
+        this.$router.replace({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
       }
     }
   }

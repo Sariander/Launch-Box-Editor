@@ -39,8 +39,8 @@
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openHeaderDialog()">Add Header Highlight</md-button>
       </md-card-actions>
-      <span v-if="lessonItem.type == 'text'">
-        <span v-for="(item, index) of lessonItem.headerHighlights" :key="item['.key']">
+      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
+        <span v-for="(item, index) of lessonItem.headerHighlights" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
           <md-field>
             <label>Header Highlight {{ index + 1 }}</label>
             <md-input v-model="lessonItem.headerHighlights[index]"></md-input>
@@ -53,12 +53,12 @@
             <md-button class="md-accent" @click="removeHeaderItem(index)">Remove</md-button>
           </md-card-actions>
         </span>
-      </span>
+      </div>
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openDetailDialog()">Add Detail Highlight</md-button>
       </md-card-actions>
-      <span v-if="lessonItem.type == 'text'">
-        <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']">
+      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
+        <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
           <md-field>
             <label>Detail Highlight {{ index + 1 }}</label>
             <md-input v-model="lessonItem.detailsHighlights[index]"></md-input>
@@ -71,7 +71,7 @@
             <md-button class="md-accent" @click="removeDetailItem(index)">Remove</md-button>
           </md-card-actions>
         </span>
-      </span>
+      </div>
       <md-field v-if="lessonItem.type == 'idea'">
         <label for="ideaStyle">Idea Type</label>
         <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
@@ -97,20 +97,30 @@
         <label>Video ID</label>
         <md-input v-model="lessonItem.url"></md-input>
       </md-field>
-      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
-        <md-switch v-model="lessonItem.question" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Question</md-switch>
-        <span class="md-layout-item md-size-2">
-          <md-icon class="far fa-question-circle"></md-icon>
-          <md-tooltip md-direction="right">Details will be hidden and Details Highlights will be disabled when not in Leader Mode.</md-tooltip>
+      <div v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left" >
+        <span class="md-layout md-alignment-center-left md-layout-item">
+          <md-switch v-model="lessonItem.important" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Important</md-switch>
+          <span class="md-layout-item md-size-2">
+            <md-icon class="far fa-question-circle"></md-icon>
+            <md-tooltip md-direction="top">Adds a star to the Header to indicate this item is important</md-tooltip>
+          </span>
         </span>
-      </span>
-      <span v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left">
-        <md-switch v-model="lessonItem.expandable" class="md-primary md-layout-item md-xlarge-size-15 md-large-size-15 md-medium-size-20 md-small-size-30 md-xsmall-size-35">Expandable</md-switch>
-        <span class="md-layout-item md-size-2">
-          <md-icon class="far fa-question-circle"></md-icon>
-          <md-tooltip md-direction="right">Expand to view Details will be enabled. All Highlights will be disabled.</md-tooltip>
+        <span class="md-layout md-alignment-center-left md-layout-item">
+          <md-switch v-model="lessonItem.question" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Question</md-switch>
+          <span class="md-layout-item md-size-2">
+            <md-icon class="far fa-question-circle"></md-icon>
+            <md-tooltip md-direction="top">Details will be hidden and Details Highlights will be disabled when not in Leader Mode.</md-tooltip>
+          </span>
         </span>
-      </span>
+        <span class="md-layout md-alignment-center-left md-layout-item">
+          <md-switch v-model="lessonItem.expandable" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Expandable</md-switch>
+          <span class="md-layout-item md-size-2">
+            <md-icon class="far fa-question-circle"></md-icon>
+            <md-tooltip md-direction="top">Expand to view Details will be enabled. All Highlights will be disabled.</md-tooltip>
+          </span>
+        </span>
+
+      </div>
       <md-field v-if="lessonItem.type == 'text'">
         <label for="style">Style</label>
         <md-select v-model="lessonItem.style" name="style" id="style">
@@ -211,7 +221,7 @@ export default {
       if (this.uploadEnd) {
         this.deleteImage(true)
       } else {
-        this.$router.go(-1)
+        this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
       }
     },
     addHeaderItem: function () {
@@ -271,7 +281,7 @@ export default {
       } else {
         db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
       }
-      this.$router.push({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
+      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     },
     selectFile () {
       this.$refs.uploadInput.click()
@@ -329,6 +339,7 @@ export default {
           this.lessonItem.style = this.lessonItem.style || 'regular'
           this.lessonItem.question = this.lessonItem.question || false
           this.lessonItem.expandable = this.lessonItem.expandable || false
+          this.lessonItem.important = this.lessonItem.important || false
           break
         case 'idea':
           this.lessonItem.url = this.lessonItem.url || ''
