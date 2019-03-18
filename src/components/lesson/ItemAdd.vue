@@ -169,8 +169,8 @@
 </template>
 
 <script>
-import { db, firestorage } from '../config/db'
-import store from '../config/store'
+import { db, firestorage } from '../../config/db'
+import store from '../../config/store'
 
 export default {
   props: {

@@ -21,9 +21,9 @@
 </template>
 
 <script>
-import { db } from '../config/db'
+import { db } from '../../config/db'
 import draggable from 'vuedraggable'
-import store from '../config/store'
+import store from '../../config/store'
 
 export default {
   components: {

@@ -8,39 +8,8 @@
     <div class="content-container">
     <draggable v-model="sectionListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="(item, index) of sectionListSorted" :key="item['.key']">
-        <div v-on:click="goToSectionOrEdit(item.sectionName, item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
-          <template v-if="item.type == 'text'">
-            <div v-bind:class="item.style">{{ item.header }}</div>
-            <div v-if="(item.style == 'detail' || item.style == 'detail_orange') && item.details && item.details != ''">{{ item.details }}</div>
-          </template>
-          <template v-if="item.type == 'setting'">
-            <md-switch>{{ item.header }}</md-switch>
-          </template>
-          <template v-if="item.type == 'section'">
-            <div v-bind:class="'orange'">{{ item.header }}</div>
-          </template>
-          <template v-if="item.type == 'link'">
-            <div>{{ item.header }}</div>
-          </template>
-          <template v-else-if="item.type == 'video'">
-            <div class="bold">{{ item.header }}</div>
-            <img v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
-          </template>
-          <template v-else-if="item.type == 'image'">
-            <img v-bind:src="item.url">
-          </template>
-          <template v-else-if="item.type == 'dropdown'">
-            <div class="md-layout md-alignment-center-center">
-              <span class="md-layout-item">{{ item.header }}</span>
-              <md-field class="md-layout-item skinny-dropdown">
-                <md-select v-on:click.stop="stopEvent" v-on:md-selected="languageChanged" :name="item.header" :id="item.header" v-model="activeLanguageCode">
-                  <md-option v-for="subItem of item.optionValues" :key="subItem['.key']" :value="subItem">{{ isoLangs[subItem].nativeName }}</md-option>
-                </md-select>
-              </md-field>
-            </div>
-          </template>
-        </div>
-        <span class="material-divider" v-if="index != sectionList.length-1"></span>
+        <section-list-item @row-clicked="goToSectionOrEdit" @dropdown-clicked="languageChanged" :item="item" :canDrag="canDrag" :hasDivider="index != sectionList.length-1">
+        </section-list-item>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
@@ -54,13 +23,15 @@
 </template>
 
 <script>
-import { db } from '../config/db'
+import { db } from '../../config/db'
 import draggable from 'vuedraggable'
-import store from '../config/store'
+import store from '../../config/store'
+import sectionListItem from './SectionListItem'
 
 export default {
   components: {
-    draggable
+    draggable,
+    'section-list-item': sectionListItem
   },
   props: {
     sectionName: String
@@ -868,34 +839,6 @@ export default {
 </script>
 
 <style scoped>
-.bold {
-  font-weight: bold;
-}
-.detail {
-  font-weight: bold;
-}
-.orange {
-  color: orange;
-}
-.detail_orange {
-  font-weight: bold;
-  color: orange;
-}
-.item-edit {
-  cursor: pointer;
-}
-.item-drag {
-  cursor: move;
-}
-.material-divider {
-  display: block;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.12);
-}
-.item-container {
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
 .content-container {
   width: 60%;
   margin: 0 auto;
@@ -909,11 +852,5 @@ export default {
 
 .wide-button {
   width: 100%
-}
-
-.skinny-dropdown {
-  min-height: 0px;
-  margin: 0px;
-  padding-top: 0px;
 }
 </style>

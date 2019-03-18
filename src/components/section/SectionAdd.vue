@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import { db } from '../config/db'
-import store from '../config/store'
+import { db } from '../../config/db'
+import store from '../../config/store'
 
 export default {
   props: {

@@ -12,27 +12,7 @@
     </span>
     <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
-        <div v-on:click="goToEdit(item['.key'])" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
-          <template v-if="item.type == 'text'">
-            <div v-bind:class="item.style" v-html="highlight(item.important ? '*' + item.header : item.header, item.headerHighlights)"></div>
-            <div v-if="item.style == 'detail' && item.details && item.details != ''" v-html="highlight(item.details, item.detailsHighlights)">{{ item.details }}</div>
-          </template>
-          <template v-if="item.type == 'idea'">
-            <div class="bold"> {{ item.header }} </div>
-            <img v-if="item.ideaStyle == 'video'" v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
-            <img v-if="item.ideaStyle == 'image'" v-bind:src="item.url">
-            <div> {{ item.details }} </div>
-            <div v-if="item.ideaStyle == 'link'" class="orange"> {{ item.urlTitle }} </div>
-          </template>
-          <template v-else-if="item.type == 'video'">
-            <div>{{ item.header }}</div>
-            <img v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
-          </template>
-          <template v-else-if="item.type == 'image'">
-            <img v-bind:src="item.url">
-          </template>
-        </div>
-        <span class="material-divider" v-if="index != displayedList.length-1"></span>
+        <lesson-list-item @row-clicked="goToEdit" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
@@ -45,13 +25,15 @@
 </template>
 
 <script>
-import { db } from '../config/db'
+import { db } from '../../config/db'
 import draggable from 'vuedraggable'
-import store from '../config/store'
+import store from '../../config/store'
+import lessonListItem from './LessonListItem'
 
 export default {
   components: {
-    draggable
+    draggable,
+    'lesson-list-item': lessonListItem
   },
   props: {
     category: String,
@@ -137,17 +119,6 @@ export default {
     })
   },
   methods: {
-    highlight (content, highlights) {
-      if (!highlights) {
-        return content
-      }
-      highlights.forEach(function (highlight) {
-        content = content.replace(new RegExp(highlight, 'gi'), match => {
-          return '<span class="orange-hightlight-text">' + match + '</span>'
-        })
-      })
-      return content
-    },
     goToAdd: function () {
       this.$router.replace({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
     },
@@ -161,28 +132,9 @@ export default {
 </script>
 
 <style scoped>
-.bold {
-  font-weight: bold;
-}
-.detail {
-  font-weight: bold;
-}
-.orange {
-  color: orange;
-}
 .content-container {
   width: 60%;
   margin: 0 auto;
-}
-.item-container {
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-.item-edit {
-  cursor: pointer;
-}
-.item-drag {
-  cursor: move;
 }
 .material-divider {
   display: block;

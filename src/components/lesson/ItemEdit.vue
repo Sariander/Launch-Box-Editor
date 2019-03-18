@@ -178,8 +178,8 @@
 </template>
 
 <script>
-import { db, firestorage } from '../config/db'
-import store from '../config/store'
+import { db, firestorage } from '../../config/db'
+import store from '../../config/store'
 
 export default {
   props: {
@@ -424,7 +424,7 @@ export default {
   background-color: rgba(0, 0, 0, 0.12);
 }
 .md-dialog {
-  width: 60%;
+  width: 40%;
   padding-left: 10px;
   padding-right: 10px;
 }
