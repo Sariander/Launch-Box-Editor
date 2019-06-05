@@ -1,10 +1,10 @@
 <template>
   <div class="lesson">
     <md-tabs :md-active-tab="currentTab" md-alignment="centered">
-      <md-tab id="study" :to="studyRoute" replace md-label="The Study"></md-tab>
-      <md-tab id="leaders" :to="leaderRoute" replace md-label="Leader's Guide"></md-tab>
-      <md-tab id="idea" :to="ideaRoute" replace md-label="Idea Box"></md-tab>
-      <md-tab id="review" :to="reviewRoute" replace md-label="Review Cards"></md-tab>
+      <md-tab id="study" @click="changeTab('study')" md-label="The Study"></md-tab>
+      <md-tab id="leaders" @click="changeTab('leadersGuide')" md-label="Leader's Guide"></md-tab>
+      <md-tab id="idea" @click="changeTab('ideaBox')" md-label="Idea Box"></md-tab>
+      <md-tab id="review" @click="changeTab('reviewCards')" md-label="Review Cards"></md-tab>
     </md-tabs>
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
@@ -126,6 +126,9 @@ export default {
       if (!this.canDrag) {
         this.$router.replace({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
       }
+    },
+    changeTab (newSection) {
+      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: newSection } })
     }
   }
 }
@@ -135,11 +138,6 @@ export default {
 .content-container {
   width: 60%;
   margin: 0 auto;
-}
-.material-divider {
-  display: block;
-  height: 1px;
-  background-color: rgba(0, 0, 0, 0.12);
 }
 .md-dialog {
   width: 60%;

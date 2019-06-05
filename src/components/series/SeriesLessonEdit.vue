@@ -4,16 +4,16 @@
         <md-card-actions>
           <md-button class="md-accent" @click="confirmDialogActive = true">Remove Lesson</md-button>
         </md-card-actions>
-        <md-field>
-          <label>Lesson Title</label>
-          <md-input v-model="lessonItem.title"></md-input>
-        </md-field>
+        <span class="md-caption">Lesson Title</span>
+        <br>
+        <span class="md-subheading">{{lessonItem.title}}</span>
         <md-field>
           <label>Lesson Image</label>
           <md-input v-model="lessonItem.image"></md-input>
         </md-field>
         <md-card-actions>
           <md-button @click="cancel()">Cancel</md-button>
+          <md-button class="md-primary" @click="showTitleChangeDialog()">Change Lesson Title</md-button>
           <md-button class="md-primary" @click="updateLesson(lessonItem)">Save</md-button>
         </md-card-actions>
         <md-dialog :md-active.sync="confirmDialogActive">
@@ -21,6 +21,19 @@
         <md-dialog-actions>
           <md-button @click="confirmDialogActive = false">Cancel</md-button>
           <md-button class="md-accent" @click="removeLesson()">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
+      <md-dialog :md-active.sync="changeDialogActive">
+        <md-dialog-title>Change the title of this lesson</md-dialog-title>
+        <md-dialog-content>
+          <md-field>
+            <label>Lesson Title</label>
+            <md-input v-model="tempName"></md-input>
+          </md-field>
+        </md-dialog-content>
+        <md-dialog-actions>
+          <md-button @click="changeDialogActive = false">Cancel</md-button>
+          <md-button class="md-primary" @click="changeLessonTitle(lessonItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
       </div>
@@ -40,14 +53,31 @@ export default {
   data () {
     return {
       confirmDialogActive: false,
+      changeDialogActive: false,
       lessonItem: {
         title: '',
         image: '',
         lesson: ''
-      }
+      },
+      tempName: ''
     }
   },
   methods: {
+    showTitleChangeDialog: function () {
+      this.changeDialogActive = true
+      this.tempName = this.lessonItem.title
+    },
+    changeLessonTitle: function (item) {
+      this.lessonItem.title = this.tempName
+      var futureTitle = this.tempName.replace(/\s+/g, '-').toLowerCase()
+      // create a copy of the item
+      const copy = { ...item }
+      // remove the .key attribute
+      delete copy['.key']
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).remove()
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(futureTitle).set(copy)
+      this.$router.push({ name: 'series', params: { category: this.category, seriesName: this.seriesName } })
+    },
     updateLesson: function (item) {
       // create a copy of the item
       const copy = { ...item }

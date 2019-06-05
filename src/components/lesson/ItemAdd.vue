@@ -11,7 +11,7 @@
           <md-option value="image">Image</md-option>
         </md-select>
       </md-field>
-      <md-field>
+      <md-field v-if="lessonItem.type != 'image'">
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
       </md-field>
@@ -26,6 +26,10 @@
       <md-field v-if="lessonItem.type == 'image'">
         <label>Image Url</label>
         <md-textarea v-model="lessonItem.url"></md-textarea>
+      </md-field>
+      <md-field v-if="lessonItem.type == 'image'">
+        <label>Local Image Filename</label>
+        <md-textarea v-model="lessonItem.localUrl"></md-textarea>
       </md-field>
       <md-card-actions v-if="lessonItem.type == 'image' && !uploadEnd && !uploading">
         <md-button class="md-primary" @click="selectFile">Upload Image</md-button>
@@ -102,7 +106,7 @@
           <md-switch v-model="lessonItem.important" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Important</md-switch>
           <span class="md-layout-item md-size-2">
             <md-icon class="far fa-question-circle"></md-icon>
-            <md-tooltip md-direction="top">Adds a star to the Header to indicate this item is important</md-tooltip>
+            <md-tooltip md-direction="top">Adds a star to the Header to indicate this item is important.</md-tooltip>
           </span>
         </span>
         <span class="md-layout md-alignment-center-left md-layout-item">
@@ -145,7 +149,7 @@
           <md-input v-model="newHeaderUrl"></md-input>
         </md-field>
         <md-dialog-actions>
-          <md-button class="md-primary" @click="clearHeaderFieldsAndClose()">Cancel</md-button>
+          <md-button @click="clearHeaderFieldsAndClose()">Cancel</md-button>
           <md-button class="md-primary" @click="addHeaderItem()">Save</md-button>
         </md-dialog-actions>
       </md-dialog>
@@ -160,7 +164,7 @@
           <md-input v-model="newDetailUrl"></md-input>
         </md-field>
         <md-dialog-actions>
-          <md-button class="md-primary" @click="clearDetailFieldsAndClose()">Cancel</md-button>
+          <md-button @click="clearDetailFieldsAndClose()">Cancel</md-button>
           <md-button class="md-primary" @click="addDetailItem()">Save</md-button>
         </md-dialog-actions>
       </md-dialog>
@@ -355,6 +359,7 @@ export default {
           break
         case 'image':
           this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.localUrl = this.lessonItem.localUrl || ''
           break
         default:
           break

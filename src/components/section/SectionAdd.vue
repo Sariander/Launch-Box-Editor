@@ -106,10 +106,10 @@ export default {
         this.sectionItem.order = -1
       }
       db.ref(store.getters.activeLanguageCode).child('section').child(this.sectionName).child('items').push(item)
-      this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
+      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     },
     cancel: function () {
-      this.$router.go(-1)
+      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     }
   }
 }

@@ -70,5 +70,10 @@ export default {
   margin-top: 10px;
   margin-bottom: 5px;
 }
+.material-divider {
+  display: block;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.12);
+}
 </style>
 

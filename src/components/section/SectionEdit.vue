@@ -178,7 +178,7 @@ export default {
       } else {
         db.ref(store.getters.activeLanguageCode).child('section').child(this.sectionName).child('items').child(this.sectionItemKey).set(copy)
       }
-      this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
+      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     },
     removeItem: function (item) {
       if (this.sectionItem.type === 'dropdown') {
@@ -189,10 +189,10 @@ export default {
       } else {
         db.ref(store.getters.activeLanguageCode).child('section').child(this.sectionName).child('items').child(this.sectionItemKey).remove()
       }
-      this.$router.push({ name: 'section', params: { sectionName: this.sectionName } })
+      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     },
     cancel: function () {
-      this.$router.go(-1)
+      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     }
   },
   mounted () {

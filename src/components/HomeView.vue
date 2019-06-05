@@ -9,21 +9,9 @@
 </template>
 
 <script>
-import { db } from '../config/db'
-
 export default {
   components: {
 
-  },
-  data () {
-    return {
-      category: 'Thrive 1'
-    }
-  },
-  firebase () {
-    return {
-      seriesList: db.ref('en').child('series').child(this.category).orderByChild('order')
-    }
   },
   methods: {
     goToSection (sectionName) {

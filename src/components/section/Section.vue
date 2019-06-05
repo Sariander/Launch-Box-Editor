@@ -821,18 +821,18 @@ export default {
     goToSectionOrEdit: function (sectionName, key) {
       if (sectionName) {
         if (!this.canNavigate && !this.canDrag) {
-          this.$router.push({ name: 'sectionEdit', params: { sectionName: this.sectionName, sectionItemKey: key } })
+          this.$router.replace({ name: 'sectionEdit', params: { sectionName: this.sectionName, sectionItemKey: key } })
         } else if (this.canNavigate && !this.canDrag) {
           this.$router.push({ name: 'section', params: { sectionName: sectionName } })
         }
       } else {
         if (!this.canNavigate && !this.canDrag) {
-          this.$router.push({ name: 'sectionEdit', params: { sectionName: this.sectionName, sectionItemKey: key } })
+          this.$router.replace({ name: 'sectionEdit', params: { sectionName: this.sectionName, sectionItemKey: key } })
         }
       }
     },
     goToAdd: function () {
-      this.$router.push({name: 'sectionAdd', params: { sectionName: this.sectionName, order: this.sectionList.length }})
+      this.$router.replace({name: 'sectionAdd', params: { sectionName: this.sectionName, order: this.sectionList.length }})
     }
   }
 }

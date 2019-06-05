@@ -13,8 +13,16 @@
         <md-input v-model="seriesItem.image"></md-input>
       </md-field>
       <md-field>
+        <label>Local Series Header Image Filename</label>
+        <md-input v-model="seriesItem.localImage"></md-input>
+      </md-field>
+      <md-field>
         <label>Series Video Image Url</label>
         <md-input v-model="seriesItem.video"></md-input>
+      </md-field>
+      <md-field>
+        <label>Local Series Video Image Filename</label>
+        <md-input v-model="seriesItem.localVideo"></md-input>
       </md-field>
       <md-field>
         <label>Summary</label>
@@ -70,7 +78,9 @@ export default {
       seriesItem: {
         title: '',
         image: '',
+        localImage: '',
         video: '',
+        localVideo: '',
         category: '',
         order: '',
         summary: ''
