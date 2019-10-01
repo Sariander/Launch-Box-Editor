@@ -4,10 +4,9 @@
       <md-card-actions>
         <md-button class="md-accent" @click="confirmDialogActive = true">Remove Series</md-button>
       </md-card-actions>
-      <md-field>
-        <label>Series Title</label>
-        <md-input v-model="seriesItem.title"></md-input>
-      </md-field>
+      <span class="md-caption">Series Title</span>
+        <br>
+        <span class="md-subheading">{{seriesItem.title}}</span>
       <md-field>
         <label>Series Header Image Url</label>
         <md-input v-model="seriesItem.image"></md-input>
@@ -31,6 +30,7 @@
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="showCategoryDialog()">Change Category</md-button>
+        <md-button class="md-primary" @click="showTitleChangeDialog()">Change Series Title</md-button>
         <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="confirmDialogActive">
@@ -58,6 +58,19 @@
           <md-button class="md-primary" @click="changeCategory(seriesItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
+      <md-dialog :md-active.sync="titleDialogActive">
+        <md-dialog-title>Change the title of this series</md-dialog-title>
+        <md-dialog-content>
+          <md-field>
+            <label>Series Title</label>
+            <md-input v-model="tempName"></md-input>
+          </md-field>
+        </md-dialog-content>
+        <md-dialog-actions>
+          <md-button @click="titleDialogActive = false">Cancel</md-button>
+          <md-button class="md-primary" @click="changeSeriesTitle(seriesItem)">Confirm</md-button>
+        </md-dialog-actions>
+      </md-dialog>
     </div>
   </div>
 </template>
@@ -75,6 +88,7 @@ export default {
     return {
       confirmDialogActive: false,
       changeDialogActive: false,
+      titleDialogActive: false,
       seriesItem: {
         title: '',
         image: '',
@@ -85,7 +99,8 @@ export default {
         order: '',
         summary: ''
       },
-      tempCategory: this.category
+      tempCategory: this.category,
+      tempName: ''
     }
   },
   methods: {
@@ -112,6 +127,21 @@ export default {
       delete copy['.key']
       db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).remove()
       db.ref(store.getters.activeLanguageCode).child('series').child(this.tempCategory).child(this.seriesName).set(copy)
+      this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
+    },
+    showTitleChangeDialog: function () {
+      this.titleDialogActive = true
+      this.tempName = this.seriesItem.title
+    },
+    changeSeriesTitle: function (item) {
+      this.seriesItem.title = this.tempName
+      var futureTitle = this.tempName.replace(/\s+/g, '-').toLowerCase()
+      // create a copy of the item
+      const copy = { ...item }
+      // remove the .key attribute
+      delete copy['.key']
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).remove()
+      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(futureTitle).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
     },
     cancel: function () {

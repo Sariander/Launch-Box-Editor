@@ -385,6 +385,7 @@ export default {
           this.lessonItem.important = this.lessonItem.important || false
           break
         case 'idea':
+          this.lessonItem.details = this.lessonItem.details || ''
           this.lessonItem.url = this.lessonItem.url || ''
           this.lessonItem.ideaStyle = this.lessonItem.ideaStyle || 'text'
           this.lessonItem.urlTitle = this.lessonItem.urlTitle || ''

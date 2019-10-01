@@ -11,6 +11,10 @@
           <label>Lesson Image</label>
           <md-input v-model="lessonItem.image"></md-input>
         </md-field>
+        <md-field>
+          <label>Lesson Local Image</label>
+          <md-input v-model="lessonItem.localImage"></md-input>
+        </md-field>
         <md-card-actions>
           <md-button @click="cancel()">Cancel</md-button>
           <md-button class="md-primary" @click="showTitleChangeDialog()">Change Lesson Title</md-button>
