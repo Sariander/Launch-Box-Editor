@@ -1,6 +1,6 @@
-# Thrive Studies Editor
+# Launch Box Editor
 
-> Thrive Studies backend editor
+> Launch Box backend editor
 
 ## Build Setup
 
