@@ -29,7 +29,6 @@
       </md-field>
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
-        <md-button class="md-primary" @click="showCategoryDialog()">Change Category</md-button>
         <md-button class="md-primary" @click="showTitleChangeDialog()">Change Series Title</md-button>
         <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
@@ -109,25 +108,16 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).set(copy)
+      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     removeSeries: function () {
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).remove()
+      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).remove()
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     showCategoryDialog: function () {
       this.tempCategory = this.category
       this.changeDialogActive = true
-    },
-    changeCategory: function (item) {
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).remove()
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.tempCategory).child(this.seriesName).set(copy)
-      this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
     },
     showTitleChangeDialog: function () {
       this.titleDialogActive = true
@@ -140,8 +130,8 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).remove()
-      db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(futureTitle).set(copy)
+      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).remove()
+      db.ref(store.getters.activeLanguageCode).child('launch').child(futureTitle).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
     },
     cancel: function () {
@@ -149,7 +139,7 @@ export default {
     }
   },
   mounted () {
-    this.$bindAsObject('seriesItem', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName))
+    this.$bindAsObject('seriesItem', db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName))
   }
 }
 </script>

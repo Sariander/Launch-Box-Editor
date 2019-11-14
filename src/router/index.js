@@ -15,6 +15,9 @@ import LessonEdit from '@/components/series/SeriesLessonEdit'
 import Section from '@/components/section/Section'
 import SectionEdit from '@/components/section/SectionEdit'
 import SectionAdd from '@/components/section/SectionAdd'
+import Question from '@/components/question/QuestionItemListView'
+import QuestionAdd from '@/components/question/QuestionAdd'
+import QuestionEdit from '@/components/question/QuestionEdit'
 
 import store from '../config/store'
 
@@ -141,9 +144,36 @@ const router = new Router({
       }
     },
     {
-      path: '/:category/:seriesName/:lessonName/:sectionName/add/',
+      path: '/thrive/:category/:seriesName/:lessonName/:sectionName/add/',
       name: 'itemAdd',
       component: ItemAdd,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/thrive/:category/:seriesName/:lessonName/:sectionName/question/:questionItemKey',
+      name: 'question',
+      component: Question,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/thrive/:category/:seriesName/:lessonName/:sectionName/question/:questionItemKey/add',
+      name: 'questionAdd',
+      component: QuestionAdd,
+      props: true,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/thrive/:category/:seriesName/:lessonName/:sectionName/question/:questionItemKey/edit/:questionKey',
+      name: 'questionEdit',
+      component: QuestionEdit,
       props: true,
       meta: {
         requiresAuth: true

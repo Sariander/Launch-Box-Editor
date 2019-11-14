@@ -1,15 +1,23 @@
 <template>
   <div class="lessonListItem">
     <div v-on:click="onRowClicked()" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
-      <template v-if="item.type == 'checklist'">
-        <div> {{ item.header }} </div>
-        <span v-for="check of item.list" :key="check.id">
-          <div> {{ check.title }}</div>
-        </span>
-      </template>
       <template v-if="item.type == 'text'">
         <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights, item.headerColoredHighlights)"></div>
         <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
+      </template>
+      <template v-if="item.type == 'idea'">
+        <div class="bold"> {{ item.header }} </div>
+        <img v-if="item.ideaStyle == 'video'" v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
+        <img v-if="item.ideaStyle == 'image'" v-bind:src="item.url">
+        <div> {{ item.details }} </div>
+        <div v-if="item.ideaStyle == 'link'" class="orange"> {{ item.urlTitle }} </div>
+      </template>
+      <template v-else-if="item.type == 'video'">
+        <div>{{ item.header }}</div>
+        <img v-bind:src="'https://img.youtube.com/vi/' + item.url + '/0.jpg'">
+      </template>
+      <template v-else-if="item.type == 'image'">
+        <img v-bind:src="item.url">
       </template>
     </div>
     <span class="material-divider" v-if="hasDivider"></span>

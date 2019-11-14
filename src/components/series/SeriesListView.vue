@@ -51,11 +51,11 @@ export default {
       set (value) {
         let updates = {}
         value.forEach((item, index) => {
-          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').on('value', function (snapshot) {
+          db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').on('value', function (snapshot) {
             updates[item['.key'] + '/lesson'] = index
           })
         })
-        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').update(updates)
+        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').update(updates)
       }
     }
   },
@@ -76,10 +76,10 @@ export default {
   firebase () {
     return {
       lesson: {
-        source: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName),
+        source: db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName),
         asObject: true
       },
-      studyList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').orderByChild('lesson')
+      studyList: db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').orderByChild('lesson')
     }
   }
 }

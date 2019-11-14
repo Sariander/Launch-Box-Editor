@@ -6,166 +6,59 @@
         <label for="type">Type</label>
         <md-select v-model="lessonItem.type" name="type" id="type">
           <md-option value="text">Text</md-option>
-          <md-option value="idea">Idea</md-option>
-          <md-option value="video">Video</md-option>
-          <md-option value="image">Image</md-option>
+          <md-option value="checklist">Checklist</md-option>
         </md-select>
       </md-field>
-      <md-field v-if="lessonItem.type != 'image'">
+      <md-field>
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'text' || lessonItem.type == 'idea'">
-        <label>Details</label>
-        <md-textarea v-model="lessonItem.details"></md-textarea>
+      <md-field v-if="lessonItem.type == 'text'">
+        <label>ID</label>
+        <md-textarea v-model="lessonItem.id"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'video'">
-        <label>Video ID</label>
-        <md-textarea v-model="lessonItem.url"></md-textarea>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'image'">
-        <label>Image Url</label>
-        <md-textarea v-model="lessonItem.url"></md-textarea>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'image'">
-        <label>Local Image Filename</label>
-        <md-textarea v-model="lessonItem.localUrl"></md-textarea>
-      </md-field>
-      <md-card-actions v-if="lessonItem.type == 'image' && !uploadEnd && !uploading">
-        <md-button class="md-primary" @click="selectFile">Upload Image</md-button>
+      <md-card-actions v-if="lessonItem.type == 'checklist'">
+        <md-button class="md-primary" @click="openHeaderDialog()">Add Checklist Item</md-button>
       </md-card-actions>
-      <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
-      <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
-      <img v-if="uploadEnd" :src="downloadURL" width="50%" />
-      <div v-if="uploadEnd">
-        <md-button class="md-accent" @click="deleteImage(false)">Delete</md-button>
-      </div>
-      <md-card-actions v-if="lessonItem.type == 'text'">
-        <md-button class="md-primary" @click="openHeaderDialog()">Add Header Highlight</md-button>
-      </md-card-actions>
-      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
-        <span v-for="(item, index) of lessonItem.headerHighlights" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
+      <div v-if="lessonItem.type == 'checklist'" class="md-layout md-gutter md-alignment-center-left">
+        <span v-for="(item, index) of lessonItem.list" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
           <md-field>
-            <label>Header Highlight {{ index + 1 }}</label>
-            <md-input v-model="lessonItem.headerHighlights[index]"></md-input>
+            <label>Checklist Title {{ index + 1 }}</label>
+            <md-input v-model="item.title"></md-input>
           </md-field>
           <md-field>
-            <label>Header Url {{ index + 1 }}</label>
-            <md-input v-model="lessonItem.headerUrls[index]"></md-input>
+            <label>Checklist ID {{ index + 1 }}</label>
+            <md-input v-model="item.id"></md-input>
           </md-field>
           <md-card-actions>
             <md-button class="md-accent" @click="removeHeaderItem(index)">Remove</md-button>
           </md-card-actions>
         </span>
       </div>
-      <md-card-actions v-if="lessonItem.type == 'text'">
-        <md-button class="md-primary" @click="openDetailDialog()">Add Detail Highlight</md-button>
-      </md-card-actions>
-      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
-        <span v-for="(item, index) of lessonItem.detailsHighlights" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
-          <md-field>
-            <label>Detail Highlight {{ index + 1 }}</label>
-            <md-input v-model="lessonItem.detailsHighlights[index]"></md-input>
-          </md-field>
-          <md-field>
-            <label>Detail Url {{ index + 1 }}</label>
-            <md-input v-model="lessonItem.detailsUrls[index]"></md-input>
-          </md-field>
-          <md-card-actions>
-            <md-button class="md-accent" @click="removeDetailItem(index)">Remove</md-button>
-          </md-card-actions>
-        </span>
-      </div>
-      <md-field v-if="lessonItem.type == 'idea'">
-        <label for="ideaStyle">Idea Type</label>
-        <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
-          <md-option value="text">Text</md-option>
-          <md-option value="link">Link</md-option>
-          <md-option value="image">Image</md-option>
-          <md-option value="video">Video</md-option>
-        </md-select>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'link'">
-        <label>Link Title</label>
-        <md-input v-model="lessonItem.urlTitle"></md-input>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'link'">
-        <label>Link Url</label>
-        <md-input v-model="lessonItem.url"></md-input>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'image'">
-        <label>Image Url</label>
-        <md-input v-model="lessonItem.url"></md-input>
-      </md-field>
-      <md-field v-if="lessonItem.type == 'idea' && lessonItem.ideaStyle == 'video'">
-        <label>Video ID</label>
-        <md-input v-model="lessonItem.url"></md-input>
-      </md-field>
-      <div v-if="lessonItem.type == 'text'" class="md-layout md-alignment-center-left" >
-        <span class="md-layout md-alignment-center-left md-layout-item">
-          <md-switch v-model="lessonItem.important" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Important</md-switch>
-          <span class="md-layout-item md-size-2">
-            <md-icon class="far fa-question-circle"></md-icon>
-            <md-tooltip md-direction="top">Adds a star to the Header to indicate this item is important.</md-tooltip>
-          </span>
-        </span>
-        <span class="md-layout md-alignment-center-left md-layout-item">
-          <md-switch v-model="lessonItem.question" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Question</md-switch>
-          <span class="md-layout-item md-size-2">
-            <md-icon class="far fa-question-circle"></md-icon>
-            <md-tooltip md-direction="top">Details will be hidden and Details Highlights will be disabled when not in Leader Mode.</md-tooltip>
-          </span>
-        </span>
-        <span class="md-layout md-alignment-center-left md-layout-item">
-          <md-switch v-model="lessonItem.expandable" class="md-primary md-layout-item md-xlarge-size-35 md-large-size-45 md-medium-size-55 md-small-size-60 md-xsmall-size-70">Expandable</md-switch>
-          <span class="md-layout-item md-size-2">
-            <md-icon class="far fa-question-circle"></md-icon>
-            <md-tooltip md-direction="top">Expand to view Details will be enabled. All Highlights will be disabled.</md-tooltip>
-          </span>
-        </span>
-
-      </div>
-      <md-field v-if="lessonItem.type == 'text'">
-        <label for="style">Style</label>
-        <md-select v-model="lessonItem.style" name="style" id="style">
-          <md-option value="regular">Regular Header</md-option>
-          <md-option value="bold">Bold Header</md-option>
-          <md-option value="detail">Header and Details</md-option>
-          <md-option value="orange">Orange Header</md-option>
-        </md-select>
-      </md-field>
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
         <md-button class="md-primary" @click="addItem(lessonItem)">Add</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="headerDialogActive">
-        <md-dialog-title>New Header Highlight</md-dialog-title>
+        <md-dialog-title>New Checklist Item</md-dialog-title>
         <md-field>
-          <label>Header Highlight</label>
-          <md-input v-model="newHeaderHighlight"></md-input>
+          <label>Checklist Title</label>
+          <md-input v-model="newItemTitle"></md-input>
         </md-field>
         <md-field>
-          <label>Header Url</label>
-          <md-input v-model="newHeaderUrl"></md-input>
+          <label>Checklist ID</label>
+          <md-input v-model="newItemID"></md-input>
         </md-field>
         <md-dialog-actions>
           <md-button @click="clearHeaderFieldsAndClose()">Cancel</md-button>
-          <md-button class="md-primary" @click="addHeaderItem()">Save</md-button>
+          <md-button class="md-primary" @click="addListItem()">Save</md-button>
         </md-dialog-actions>
       </md-dialog>
-      <md-dialog :md-active.sync="detailDialogActive">
-        <md-dialog-title>New Detail Highlight</md-dialog-title>
-        <md-field>
-          <label>Detail Highlight</label>
-          <md-input v-model="newDetailHighlight"></md-input>
-        </md-field>
-        <md-field>
-          <label>Detail Url</label>
-          <md-input v-model="newDetailUrl"></md-input>
-        </md-field>
+      <md-dialog :md-active.sync="confirmDialogActive">
+        <md-dialog-title>Are you sure you want to remove this item?</md-dialog-title>
         <md-dialog-actions>
-          <md-button @click="clearDetailFieldsAndClose()">Cancel</md-button>
-          <md-button class="md-primary" @click="addDetailItem()">Save</md-button>
+          <md-button @click="confirmDialogActive = false">Cancel</md-button>
+          <md-button class="md-accent" @click="removeItem(lessonItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
     </div>
@@ -192,12 +85,11 @@ export default {
       uploading: false,
       uploadEnd: false,
       downloadURL: '',
+      confirmDialogActive: false,
       headerDialogActive: false,
       detailDialogActive: false,
-      newHeaderHighlight: '',
-      newHeaderUrl: '',
-      newDetailHighlight: '',
-      newDetailUrl: '',
+      newItemTitle: '',
+      newItemID: '',
       lessonItem: {
         type: 'text',
         order: this.order
@@ -228,62 +120,32 @@ export default {
         this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
       }
     },
-    addHeaderItem: function () {
-      if (!this.lessonItem.headerHighlights) {
-        this.$set(this.lessonItem, 'headerHighlights', [])
+    addListItem: function () {
+      if (!this.lessonItem.list) {
+        this.$set(this.lessonItem, 'list', [])
       }
-      this.lessonItem.headerHighlights.push(this.newHeaderHighlight)
-      if (!this.lessonItem.headerUrls) {
-        this.$set(this.lessonItem, 'headerUrls', [])
-      }
-      this.lessonItem.headerUrls.push(this.newHeaderUrl)
+      this.lessonItem.list.push({title: this.newItemTitle, id: this.newItemID})
       this.headerDialogActive = false
     },
-    addDetailItem: function () {
-      if (!this.lessonItem.detailsHighlights) {
-        this.$set(this.lessonItem, 'detailsHighlights', [])
-      }
-      this.lessonItem.detailsHighlights.push(this.newDetailHighlight)
-      if (!this.lessonItem.detailsUrls) {
-        this.$set(this.lessonItem, 'detailsUrls', [])
-      }
-      this.lessonItem.detailsUrls.push(this.newDetailUrl)
-      this.detailDialogActive = false
-    },
     removeHeaderItem: function (index) {
-      this.lessonItem.headerHighlights.splice(index, 1)
-      this.lessonItem.headerUrls.splice(index, 1)
-    },
-    removeDetailItem: function (index) {
-      this.lessonItem.detailsHighlights.splice(index, 1)
-      this.lessonItem.detailsUrls.splice(index, 1)
+      this.lessonItem.list.splice(index, 1)
     },
     openHeaderDialog: function () {
-      this.newHeaderHighlight = ''
-      this.newHeaderUrl = ''
+      this.newItemTitle = ''
+      this.newItemID = ''
       this.headerDialogActive = true
     },
     clearHeaderFieldsAndClose: function () {
-      this.newHeaderHighlight = ''
-      this.newHeaderUrl = ''
+      this.newItemTitle = ''
+      this.newItemID = ''
       this.headerDialogActive = false
-    },
-    openDetailDialog: function () {
-      this.newDetailHighlight = ''
-      this.newDetailUrl = ''
-      this.detailDialogActive = true
-    },
-    clearDetailFieldsAndClose: function () {
-      this.newDetailHighlight = ''
-      this.newDetailUrl = ''
-      this.detailDialogActive = false
     },
     addItem: function (item) {
       this.prepareItemForSending()
       if (this.sectionName === 'reviewCards') {
-        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.sectionName).push(item)
+        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('study').push(item)
       } else {
-        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.sectionName).push(item)
+        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').push(item)
       }
       this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName } })
     },
@@ -341,25 +203,8 @@ export default {
         case 'text':
           this.lessonItem.details = this.lessonItem.details || ''
           this.lessonItem.style = this.lessonItem.style || 'regular'
-          this.lessonItem.question = this.lessonItem.question || false
-          this.lessonItem.expandable = this.lessonItem.expandable || false
-          this.lessonItem.important = this.lessonItem.important || false
           break
-        case 'idea':
-          this.lessonItem.url = this.lessonItem.url || ''
-          this.lessonItem.ideaStyle = this.lessonItem.ideaStyle || 'url'
-          this.lessonItem.urlTitle = this.lessonItem.urlTitle || ''
-          if (this.lessonItem.ideaStyle === 'video') {
-            this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
-          }
-          break
-        case 'video':
-          this.lessonItem.url = this.lessonItem.url || ''
-          this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
-          break
-        case 'image':
-          this.lessonItem.url = this.lessonItem.url || ''
-          this.lessonItem.localUrl = this.lessonItem.localUrl || ''
+        case 'checklist':
           break
         default:
           break

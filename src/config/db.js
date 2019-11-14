@@ -1,11 +1,12 @@
 import Firebase from 'firebase'
 var config = {
-  apiKey: 'AIzaSyDqRadwpsnjIGOlpvYIzW2fUCnmpVtSXbE',
-  authDomain: 'thrive-studies-2-8ddb5.firebaseapp.com',
-  databaseURL: 'https://thrive-studies-2-8ddb5.firebaseio.com',
-  projectId: 'thrive-studies-2-8ddb5',
-  storageBucket: 'thrive-studies-2-8ddb5.appspot.com',
-  messagingSenderId: '125775085187'
+  apiKey: 'AIzaSyCuHiELlCjxtyZ5UGq_xdiKsF83enxe968',
+  authDomain: 'launch-box-1.firebaseapp.com',
+  databaseURL: 'https://launch-box-1.firebaseio.com',
+  projectId: 'launch-box-1',
+  storageBucket: 'launch-box-1.appspot.com',
+  messagingSenderId: '1045503569156',
+  appId: '1:1045503569156:web:3a2cf40a49cf9b37267451'
 }
 let app = Firebase.initializeApp(config)
 export const db = app.database()

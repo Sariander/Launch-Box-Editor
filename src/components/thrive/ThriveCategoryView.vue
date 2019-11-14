@@ -49,11 +49,11 @@ export default {
       set (value) {
         let updates = {}
         value.forEach((item, index) => {
-          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).on('value', function (snapshot) {
+          db.ref(store.getters.activeLanguageCode).child('launch').on('value', function (snapshot) {
             updates[item['.key'] + '/order'] = index
           })
         })
-        db.ref(store.getters.activeLanguageCode).child('series').child(this.category).update(updates)
+        db.ref(store.getters.activeLanguageCode).child('launch').update(updates)
       }
     }
   },
@@ -73,7 +73,7 @@ export default {
   },
   mounted () {
     this.$watch('category', () => {
-      this.$bindAsArray('seriesList', db.ref(store.getters.activeLanguageCode).child('series').child(this.category).orderByChild('order'))
+      this.$bindAsArray('seriesList', db.ref(store.getters.activeLanguageCode).child('launch').orderByChild('order'))
     }, {
       immediate: true
     })

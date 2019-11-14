@@ -53,7 +53,7 @@ export default {
       loading: true,
       user: null,
       showNavigation: false,
-      title: 'Thrive Studies',
+      title: 'Launch Box',
       tabs: [
         {
           id: 0,
@@ -64,31 +64,10 @@ export default {
         },
         {
           id: 1,
-          text: 'Follow Up',
-          key: 'follow-up',
+          text: 'Launch',
+          key: 'launch',
           route: 'thrive',
           icon: 'list'
-        },
-        {
-          id: 2,
-          text: 'Thrive 1',
-          key: 'thrive-1',
-          route: 'thrive',
-          icon: 'looks_one'
-        },
-        {
-          id: 3,
-          text: 'Thrive 2',
-          key: 'thrive-2',
-          route: 'thrive',
-          icon: 'looks_two'
-        },
-        {
-          id: 4,
-          text: 'Thrive 3',
-          key: 'thrive-3',
-          route: 'thrive',
-          icon: 'looks_3'
         }
       ],
       lessonAdd: false,
@@ -189,6 +168,15 @@ export default {
         case 'itemAdd':
           this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Add Item'
           break
+        case 'question':
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Question '
+          break
+        case 'questionEdit':
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Question / Edit'
+          break
+        case 'questionAdd':
+          this.title = this.convertTitle(route.params.category) + ' / ' + this.convertTitle(route.params.seriesName) + ' / ' + this.convertTitle(route.params.lessonName) + ' / Question / Add'
+          break
         default:
       }
     }
@@ -211,7 +199,12 @@ export default {
   padding: 0px;
 }
 
-.orange-hightlight-text {
-  color: orange
+.gold-highlight-text {
+  color: gold;
+  font-weight: bold;
+}
+
+.bold-highlight-text {
+  font-weight: bold;
 }
 </style>

@@ -1,18 +1,15 @@
 <template>
   <div class="lesson">
     <md-tabs :md-active-tab="currentTab" md-alignment="centered">
-      <md-tab id="study" @click="changeTab('study')" md-label="The Study"></md-tab>
-      <md-tab id="leaders" @click="changeTab('leadersGuide')" md-label="Leader's Guide"></md-tab>
-      <md-tab id="idea" @click="changeTab('ideaBox')" md-label="Idea Box"></md-tab>
-      <md-tab id="review" @click="changeTab('reviewCards')" md-label="Review Cards"></md-tab>
     </md-tabs>
     <span class=button-container>
       <md-switch v-model="canDrag">Reorder</md-switch>
       <br>
+      <md-switch v-model="editMode">Edit</md-switch>
     </span>
     <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
-        <lesson-list-item @row-clicked="goToEdit" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
+        <lesson-list-item @row-clicked="goToEdit(item.type, item['.key'])" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
@@ -45,6 +42,7 @@ export default {
     return {
       currentTab: '',
       canDrag: false,
+      editMode: false,
       lessonItems: [],
       displayedList: [],
       studyRoute: '',
@@ -63,30 +61,17 @@ export default {
       set (value) {
         let updates = {}
         value.forEach((item, index) => {
-          if (this.section === 'reviewCards') {
-            db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.section).on('value', function (snapshot) {
-              updates[item['.key'] + '/order'] = index
-            })
-          } else {
-            db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).on('value', function (snapshot) {
-              updates[item['.key'] + '/order'] = index
-            })
-          }
+          db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').on('value', function (snapshot) {
+            updates[item['.key'] + '/order'] = index
+          })
         })
-        if (this.section === 'reviewCards') {
-          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child(this.section).update(updates)
-        } else {
-          db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child(this.section).update(updates)
-        }
+        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').update(updates)
       }
     }
   },
   firebase () {
     return {
-      studyList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('study').orderByChild('order'),
-      leadersGuideList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('leadersGuide').orderByChild('order'),
-      ideaBoxList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('studies').child(this.lessonName).child('ideaBox').orderByChild('order'),
-      reviewCardsList: db.ref(store.getters.activeLanguageCode).child('series').child(this.category).child(this.seriesName).child('reviewCards').orderByChild('order')
+      studyList: db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').orderByChild('order')
     }
   },
   mounted () {
@@ -122,9 +107,13 @@ export default {
     goToAdd: function () {
       this.$router.replace({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
     },
-    goToEdit (key) {
+    goToEdit (type, key) {
       if (!this.canDrag) {
-        this.$router.replace({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
+        if (this.editMode) {
+          this.$router.replace({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
+        } else if (type === 'text') {
+          this.$router.push({name: 'question', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: 'study', questionItemKey: key }})
+        }
       }
     },
     changeTab (newSection) {
