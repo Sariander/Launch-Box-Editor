@@ -123,17 +123,17 @@ export default {
       switch (route.name) {
         case 'Home':
         case 'Login':
-          this.title = 'Thrive Studies Editor'
+          this.title = 'Launch Box Editor'
           break
         case 'section':
-          this.title = 'Thrive Studies Editor'
+          this.title = 'Launch Box Editor'
           this.sectionAdd = true
           break
         case 'sectionEdit':
-          this.title = 'Thrive Studies Editor'
+          this.title = 'Launch Box Editor'
           break
         case 'sectionAdd':
-          this.title = 'Thrive Studies Editor'
+          this.title = 'Launch Box Editor'
           break
         case 'followup':
           this.lessonAdd = true
