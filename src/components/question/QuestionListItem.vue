@@ -2,7 +2,7 @@
   <div class="lessonListItem">
     <div v-on:click="onRowClicked()" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
       <template v-if="item.type == 'text'">
-        <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights, item.headerColoredHighlights)"></div>
+        <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights, item.headerColoredHighlights, item.headerLinkHighlights)"></div>
         <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
       </template>
       <template v-if="item.type == 'idea'">
@@ -32,7 +32,7 @@ export default {
     hasDivider: Boolean
   },
   methods: {
-    highlight (content, highlights, coloredHighlights) {
+    highlight (content, highlights, coloredHighlights, linkHighlights) {
       if (highlights) {
         highlights.forEach(function (highlight) {
           content = content.replace(new RegExp(highlight, 'gi'), match => {
@@ -42,6 +42,13 @@ export default {
       }
       if (coloredHighlights) {
         coloredHighlights.forEach(function (highlight) {
+          content = content.replace(new RegExp(highlight, 'gi'), match => {
+            return '<span class="gold-highlight-text">' + match + '</span>'
+          })
+        })
+      }
+      if (linkHighlights) {
+        linkHighlights.forEach(function (highlight) {
           content = content.replace(new RegExp(highlight, 'gi'), match => {
             return '<span class="gold-highlight-text">' + match + '</span>'
           })

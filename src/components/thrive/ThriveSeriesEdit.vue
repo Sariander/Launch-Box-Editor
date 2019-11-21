@@ -4,23 +4,23 @@
       <md-card-actions>
         <md-button class="md-accent" @click="confirmDialogActive = true">Remove Series</md-button>
       </md-card-actions>
-      <span class="md-caption">Series Title</span>
+      <span class="md-caption">Section Title</span>
         <br>
         <span class="md-subheading">{{seriesItem.title}}</span>
       <md-field>
-        <label>Series Header Image Url</label>
+        <label>Section Header Image Url</label>
         <md-input v-model="seriesItem.image"></md-input>
       </md-field>
       <md-field>
-        <label>Local Series Header Image Filename</label>
+        <label>Local Section Header Image Filename</label>
         <md-input v-model="seriesItem.localImage"></md-input>
       </md-field>
       <md-field>
-        <label>Series Video Image Url</label>
+        <label>Section Video Image Url</label>
         <md-input v-model="seriesItem.video"></md-input>
       </md-field>
       <md-field>
-        <label>Local Series Video Image Filename</label>
+        <label>Local Section Video Image Filename</label>
         <md-input v-model="seriesItem.localVideo"></md-input>
       </md-field>
       <md-field>

@@ -3,7 +3,6 @@
     <draggable v-model="seriesListSorted" :options="{disabled: !canDrag}" class="content-container">
       <div v-for="item of seriesListSorted" :key="item['.key']" v-bind:class="canDrag ? 'item-drag' : 'item-edit'" class="container" v-on:click="goToSpecificSeries(item['.key'])">
         <img v-bind:src="item.image">
-        <div class="centered">{{ item.title }}</div>
       </div>
     </draggable>
     <span class=button-container>
@@ -124,7 +123,6 @@ export default {
 
 .container img {
   width: 100%;
-  filter: brightness(75%);
   margin: 0px 0px 5px;
   object-fit: cover;
   height: 150px;

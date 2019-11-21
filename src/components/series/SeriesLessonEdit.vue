@@ -8,12 +8,20 @@
         <br>
         <span class="md-subheading">{{lessonItem.title}}</span>
         <md-field>
-          <label>Lesson Image</label>
+          <label>Chapter Unread Image</label>
           <md-input v-model="lessonItem.image"></md-input>
         </md-field>
         <md-field>
-          <label>Lesson Local Image</label>
+          <label>Chapter Unread Local Image</label>
           <md-input v-model="lessonItem.localImage"></md-input>
+        </md-field>
+        <md-field>
+          <label>Chapter Read Image</label>
+          <md-input v-model="lessonItem.imageRead"></md-input>
+        </md-field>
+        <md-field>
+          <label>Chapter Read Local Image</label>
+          <md-input v-model="lessonItem.localImageRead"></md-input>
         </md-field>
         <md-card-actions>
           <md-button @click="cancel()">Cancel</md-button>

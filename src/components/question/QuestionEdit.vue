@@ -71,6 +71,34 @@
           </md-card-actions>
         </span>
       </div>
+      <md-card-actions v-if="lessonItem.type == 'text'">
+        <md-button class="md-primary" @click="openHeaderLinkDialog()">Add Header Link Highlight</md-button>
+      </md-card-actions>
+      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
+        <span v-for="(item, index) of lessonItem.headerLinkHighlights" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
+          <md-field>
+            <label>Header Link {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.headerLinkHighlights[index]"></md-input>
+          </md-field>
+          <md-card-actions>
+            <md-button class="md-accent" @click="removeHeaderLinkItem(index)">Remove</md-button>
+          </md-card-actions>
+        </span>
+      </div>
+      <md-card-actions v-if="lessonItem.type == 'text'">
+        <md-button class="md-primary" @click="openHeaderUrlDialog()">Add Header Link Url</md-button>
+      </md-card-actions>
+      <div v-if="lessonItem.type == 'text'" class="md-layout md-gutter md-alignment-center-left">
+        <span v-for="(item, index) of lessonItem.headerLinkUrls" :key="item['.key']" class="md-layout-item md-xlarge-size-33 md-large-size-50 md-medium-size-50 md-small-size-100 md-xsmall-size-100">
+          <md-field>
+            <label>Header Url {{ index + 1 }}</label>
+            <md-input v-model="lessonItem.headerLinkUrls[index]"></md-input>
+          </md-field>
+          <md-card-actions>
+            <md-button class="md-accent" @click="removeHeaderUrlItem(index)">Remove</md-button>
+          </md-card-actions>
+        </span>
+      </div>
       <md-field v-if="lessonItem.type == 'idea'">
         <label for="ideaStyle">Idea Type</label>
         <md-select v-model="lessonItem.ideaStyle" name="ideaStyle" id="ideaStyle">
@@ -139,6 +167,28 @@
           <md-button class="md-accent" @click="removeItem(lessonItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
+      <md-dialog :md-active.sync="headerLinkDialogActive">
+        <md-dialog-title>New Header Link Highlight</md-dialog-title>
+        <md-field>
+          <label>Header Link Highlight</label>
+          <md-input v-model="newHeaderLink"></md-input>
+        </md-field>
+        <md-dialog-actions>
+          <md-button @click="clearHeaderLinkFieldsAndClose()">Cancel</md-button>
+          <md-button class="md-primary" @click="addHeaderLinkItem()">Save</md-button>
+        </md-dialog-actions>
+      </md-dialog>
+      <md-dialog :md-active.sync="headerUrlDialogActive">
+        <md-dialog-title>New Header Link Url</md-dialog-title>
+        <md-field>
+          <label>Header Url</label>
+          <md-input v-model="newHeaderUrl"></md-input>
+        </md-field>
+        <md-dialog-actions>
+          <md-button @click="clearHeaderUrlFieldsAndClose()">Cancel</md-button>
+          <md-button class="md-primary" @click="addHeaderUrlItem()">Save</md-button>
+        </md-dialog-actions>
+      </md-dialog>
     </div>
   </div>
 </template>
@@ -167,8 +217,12 @@ export default {
       confirmDialogActive: false,
       headerDialogActive: false,
       detailDialogActive: false,
+      headerLinkDialogActive: false,
+      headerUrlDialogActive: false,
       newHeaderHighlight: '',
       newHeaderColoredHighlight: '',
+      newHeaderLink: '',
+      newHeaderUrl: '',
       lessonItem: {
         type: 'text',
         header: '',
@@ -223,11 +277,31 @@ export default {
       this.lessonItem.headerColoredHighlights.push(this.newHeaderColoredHighlight)
       this.detailDialogActive = false
     },
+    addHeaderLinkItem: function () {
+      if (!this.lessonItem.headerLinkHighlights) {
+        this.$set(this.lessonItem, 'headerLinkHighlights', [])
+      }
+      this.lessonItem.headerLinkHighlights.push(this.newHeaderLink)
+      this.headerLinkDialogActive = false
+    },
+    addHeaderUrlItem: function () {
+      if (!this.lessonItem.headerLinkUrls) {
+        this.$set(this.lessonItem, 'headerLinkUrls', [])
+      }
+      this.lessonItem.headerLinkUrls.push(this.newHeaderUrl)
+      this.headerUrlDialogActive = false
+    },
     removeHeaderItem: function (index) {
       this.lessonItem.headerHighlights.splice(index, 1)
     },
     removeColoredHeaderItem: function (index) {
       this.lessonItem.headerColoredHighlights.splice(index, 1)
+    },
+    removeHeaderLinkItem: function (index) {
+      this.lessonItem.headerLinkHighlights.splice(index, 1)
+    },
+    removeHeaderUrlItem: function (index) {
+      this.lessonItem.headerLinkUrls.splice(index, 1)
     },
     openHeaderDialog: function () {
       this.newHeaderHighlight = ''
@@ -244,6 +318,22 @@ export default {
     clearDetailFieldsAndClose: function () {
       this.newHeaderColoredHighlight = ''
       this.detailDialogActive = false
+    },
+    openHeaderLinkDialog: function () {
+      this.newHeaderLink = ''
+      this.headerLinkDialogActive = true
+    },
+    clearHeaderLinkFieldsAndClose: function () {
+      this.newHeaderLink = ''
+      this.headerLinkDialogActive = false
+    },
+    openHeaderUrlDialog: function () {
+      this.newHeaderUrl = ''
+      this.headerUrlDialogActive = true
+    },
+    clearHeaderUrlFieldsAndClose: function () {
+      this.newHeaderUrl = ''
+      this.headerUrlDialogActive = false
     },
     updateItem: function (item) {
       this.prepareItemForSending()
