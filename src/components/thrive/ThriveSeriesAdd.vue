@@ -2,27 +2,31 @@
   <div class="seriesAdd">
     <div class="content-container">
     <md-field>
-        <label>Series Title</label>
+        <label>Section Title</label>
         <md-input v-model="seriesItem.title"></md-input>
       </md-field>
       <md-field>
-        <label>Series Header Image Url</label>
+        <label>Section Header Image Url</label>
         <md-input v-model="seriesItem.image"></md-input>
       </md-field>
       <md-field>
-        <label>Local Series Header Image Filename</label>
-        <md-input v-model="seriesItem.image"></md-input>
+        <label>Local Section Header Image Filename</label>
+        <md-input v-model="seriesItem.localImage"></md-input>
       </md-field>
       <md-field>
-        <label>Series Video Image Url</label>
+        <label>Section Video Image Url</label>
         <md-input v-model="seriesItem.video"></md-input>
       </md-field>
       <md-field>
-        <label>Local Series Video Image Filename</label>
+        <label>Local Section Video Image Filename</label>
         <md-input v-model="seriesItem.localVideo"></md-input>
       </md-field>
       <md-field>
-        <label>Series Summary</label>
+        <label>Section Youtube Video ID</label>
+        <md-input v-model="seriesItem.videoID"></md-input>
+      </md-field>
+      <md-field>
+        <label>Summary</label>
         <md-textarea v-model="seriesItem.summary"></md-textarea>
       </md-field>
       <md-card-actions>
@@ -50,6 +54,7 @@ export default {
         localImage: '',
         video: '',
         localVideo: '',
+        videoID: '',
         category: '',
         order: this.order,
         summary: ''
@@ -61,11 +66,26 @@ export default {
       if (this.seriesItem.order === undefined) {
         this.seriesItem.order = -1
       }
+      this.seriesItem.videoID = this.YouTubeGetID(this.seriesItem.videoID)
       let key = this.seriesItem.title
       key = key.replace(/\s+/g, '-').toLowerCase()
       item.category = this.category
       db.ref(store.getters.activeLanguageCode).child('launch').child(key).set(item)
       this.$router.push({ name: 'thrive', params: { category: this.category } })
+    },
+    YouTubeGetID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      console.log(url)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
+      } else if (url[0] !== undefined) {
+        ID = url[0]
+      } else {
+        ID = url
+      }
+      return ID
     },
     cancel: function () {
       this.$router.go(-1)

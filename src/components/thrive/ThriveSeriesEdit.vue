@@ -24,6 +24,10 @@
         <md-input v-model="seriesItem.localVideo"></md-input>
       </md-field>
       <md-field>
+        <label>Section Youtube Video ID</label>
+        <md-input v-model="seriesItem.videoID"></md-input>
+      </md-field>
+      <md-field>
         <label>Summary</label>
         <md-textarea v-model="seriesItem.summary"></md-textarea>
       </md-field>
@@ -94,6 +98,7 @@ export default {
         localImage: '',
         video: '',
         localVideo: '',
+        videoID: '',
         category: '',
         order: '',
         summary: ''
@@ -104,6 +109,7 @@ export default {
   },
   methods: {
     updateSeries: function (item) {
+      this.seriesItem.videoID = this.YouTubeGetID(this.seriesItem.videoID)
       // create a copy of the item
       const copy = { ...item }
       // remove the .key attribute
@@ -133,6 +139,20 @@ export default {
       db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).remove()
       db.ref(store.getters.activeLanguageCode).child('launch').child(futureTitle).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
+    },
+    YouTubeGetID (url) {
+      var ID = ''
+      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
+      console.log(url)
+      if (url[2] !== undefined) {
+        ID = url[2].split(/[^0-9a-z_-]/i)
+        ID = ID[0]
+      } else if (url[0] !== undefined) {
+        ID = url[0]
+      } else {
+        ID = url
+      }
+      return ID
     },
     cancel: function () {
       this.$router.go(-1)

@@ -125,7 +125,7 @@ export default {
   width: 100%;
   margin: 0px 0px 5px;
   object-fit: cover;
-  height: 150px;
+  height: 160px;
 }
 
 .centered {
