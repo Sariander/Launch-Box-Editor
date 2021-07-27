@@ -7,42 +7,48 @@
       </md-card-actions>
       <md-field>
         <label for="type">Type</label>
-        <md-select v-model="lessonItem.type" name="type" id="type">
+        <md-select v-model="lessonItem.type" @md-selected="onTypeSelect" name="type" id="type">
           <md-option value="text">Text</md-option>
-          <md-option value="idea">Idea</md-option>
-          <md-option value="video">Video</md-option>
+          <md-option v-if="editor && editor.admin" value="idea">Idea</md-option>
+          <md-option value="video">Youtube Video</md-option>
           <md-option value="image">Image</md-option>
         </md-select>
       </md-field>
-      <md-field v-if="lessonItem.type != 'image'">
+      <md-field v-if="lessonItem.type == 'text' || lessonItem.type == 'idea'">
         <label>Header</label>
         <md-textarea v-model="lessonItem.header"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'text' || lessonItem.type == 'idea'">
+      <md-field v-if="(lessonItem.type == 'text' && lessonItem.style == 'detail') || lessonItem.type == 'idea'">
         <label>Details</label>
         <md-textarea v-model="lessonItem.details"></md-textarea>
       </md-field>
+      <span v-if="lessonItem.type == 'video'">
+        <div class="md-caption">Thumbnail</div>
+        <img :src="thumbnailUrl" width="30%" />
+        <div>
+          <md-button class="md-primary" @click="loadThumbnail">Load Thumbnail</md-button>
+        </div>
+      </span>
       <md-field v-if="lessonItem.type == 'video'">
         <label>Video ID</label>
         <md-textarea v-model="lessonItem.url"></md-textarea>
       </md-field>
-      <md-field v-if="lessonItem.type == 'image'">
-        <label>Image Url</label>
-        <md-textarea v-model="lessonItem.url"></md-textarea>
-      </md-field>
+      <span v-if="lessonItem.type == 'image'">
+        <div class="md-caption">Image</div>
+        <img :src="lessonItem.url" width="20%" />
+        <div v-if="!uploadEnd && !uploading">
+          <md-button class="md-primary" @click="selectFile">Upload New Image</md-button>
+        </div>
+        <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
+        <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
+        <div v-if="uploadEnd">
+          <md-button class="md-accent" @click="deleteImage(false)">Revert To Previous Image</md-button>
+        </div>
+      </span>
       <md-field v-if="lessonItem.type == 'image'">
         <label>Local Image Filename</label>
         <md-textarea v-model="lessonItem.localUrl"></md-textarea>
       </md-field>
-      <md-card-actions v-if="lessonItem.type == 'image' && !uploadEnd && !uploading">
-        <md-button class="md-primary" @click="selectFile">Upload Image</md-button>
-      </md-card-actions>
-      <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
-      <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
-      <img v-if="uploadEnd" :src="downloadURL" width="50%" />
-      <div v-if="uploadEnd">
-        <md-button class="md-accent" @click="deleteImage(false)">Delete</md-button>
-      </div>
       <md-card-actions v-if="lessonItem.type == 'text'">
         <md-button class="md-primary" @click="openHeaderDialog()">Add Header Highlight</md-button>
       </md-card-actions>
@@ -200,8 +206,8 @@ import store from '../../config/store'
 export default {
   props: {
     category: String,
-    seriesName: String,
-    lessonName: String,
+    seriesId: String,
+    lessonId: String,
     sectionName: String,
     questionItemKey: String,
     questionKey: String
@@ -214,6 +220,7 @@ export default {
       uploading: false,
       uploadEnd: false,
       downloadURL: '',
+      thumbnailUrl: '',
       confirmDialogActive: false,
       headerDialogActive: false,
       detailDialogActive: false,
@@ -229,12 +236,20 @@ export default {
         details: '',
         headerHighlights: [],
         headerColoredHighlights: []
-      }
+      },
+      editor: null
     }
   },
   mounted () {
     this.$watch('sectionName', () => {
-      this.$bindAsObject('lessonItem', db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').child(this.questionKey))
+      this.$rtdbBind('lessonItem', db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').child(this.questionKey))
+    }, {
+      immediate: true
+    })
+    this.$watch('user', () => {
+      if (store.getters.editorId) {
+        this.$rtdbBind('editor', db.ref('editors').child(store.getters.editorId))
+      }
     }, {
       immediate: true
     })
@@ -260,7 +275,7 @@ export default {
       if (this.uploadEnd) {
         this.deleteImage(true)
       } else {
-        this.$router.replace({ name: 'question', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName, questionItemKey: this.questionItemKey } })
+        this.$router.go(-1)
       }
     },
     addHeaderItem: function () {
@@ -341,18 +356,32 @@ export default {
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').child(item['.key']).set(copy)
-      this.$router.replace({ name: 'question', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName, questionItemKey: this.questionItemKey } })
+      db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').child(item['.key']).set(copy)
+      this.$router.go(-1)
     },
     removeItem: function (item) {
-      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').child(item['.key']).remove()
-      this.$router.replace({ name: 'question', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: this.sectionName, questionItemKey: this.questionItemKey } })
+      db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').child(item['.key']).remove()
+      this.$router.go(-1)
+    },
+    onTypeSelect (type) {
+      if (type === 'video') {
+        if (this.lessonItem.url) {
+          this.lessonItem.url = this.lessonItem.url || ''
+          this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
+          this.thumbnailUrl = 'https://img.youtube.com/vi/' + this.lessonItem.url + '/0.jpg'
+        }
+      }
+    },
+    loadThumbnail () {
+      this.lessonItem.url = this.lessonItem.url || ''
+      this.lessonItem.url = this.YouTubeGetID(this.lessonItem.url)
+      this.thumbnailUrl = 'https://img.youtube.com/vi/' + this.lessonItem.url + '/0.jpg'
     },
     selectFile () {
       this.$refs.uploadInput.click()
     },
     detectFiles (e) {
-      let fileList = e.target.files || e.dataTransfer.files
+      const fileList = e.target.files || e.dataTransfer.files
       Array.from(Array(fileList.length).keys()).map(x => {
         this.upload(fileList[x])
       })
@@ -360,17 +389,22 @@ export default {
     upload (file) {
       this.fileName = file.name
       this.uploading = true
-      this.uploadTask = firestorage.ref(this.seriesName + '/' + this.lessonName + '/' + file.name).put(file)
+      this.uploadTask = firestorage.ref(this.seriesId + '/' + this.lessonId + '/' + store.getters.activeLanguageCode + '/' + this.questionItemKey + '/' + file.name).put(file)
     },
     deleteImage (navigate) {
       firestorage
-        .ref(this.seriesName + '/' + this.lessonName + '/' + this.fileName)
+        .ref(this.seriesId + '/' + this.lessonId + '/' + store.getters.activeLanguageCode + '/' + this.questionItemKey + '/' + this.fileName)
         .delete()
         .then(() => {
           this.uploading = false
           this.uploadEnd = false
           this.downloadURL = ''
           this.lessonItem.url = ''
+          if (!navigate) {
+            db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').child(this.questionKey).child('url').once('value', snapshot => {
+              this.lessonItem.url = snapshot.val()
+            })
+          }
           if (navigate) {
             this.$router.go(-1)
           }
@@ -446,10 +480,8 @@ export default {
   height: 1px;
   background-color: rgba(0, 0, 0, 0.12);
 }
-.md-dialog {
-  width: 40%;
-  padding-left: 10px;
-  padding-right: 10px;
+.md-content {
+  padding: 0px 8px;
 }
 input[type="file"] {
   position: absolute;

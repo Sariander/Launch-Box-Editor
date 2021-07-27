@@ -4,39 +4,15 @@
       <p v-if="loading">Loading...</p>
       <template v-if="!user && !loading">
         <md-button class="md-raised" @click="signInWithGoogle">Sign in with Google</md-button>
-        <div class="form">
-          <form novalidate class="md-layout" @submit.prevent="validateUser">
-              <md-field :class="getValidationClass('email')">
-                <label for="email">Email</label>
-                <md-input type="email" name="email" id="email" autocomplete="email" v-model="form.email"/>
-                <span class="md-error" v-if="!$v.form.email.required">Email is required</span>
-                <span class="md-error" v-else-if="!$v.form.email.email">Invalid email</span>
-              </md-field>
-              <md-field :class="getValidationClass('password')" :md-toggle-password="false">
-                <label for="password">Password</label>
-                <md-input type="password" name="password" id="password" autocomplete="password" v-model="form.password" />
-                <span class="md-error" v-if="!$v.form.password.required">Password is required</span>
-              </md-field>
-              <div class="actions md-layout md-alignment-center-space-between">
-                <md-button class="md-primary" @click="goToPasswordReset()">Reset password</md-button>
-                <md-button type="submit" class="md-raised md-primary">Log in</md-button>
-              </div>
-          </form>
-          <h3 class="error" v-if="loginFailed">Invalid email or password</h3>
-        </div>
       </template>
     </div>
   </div>
 </template>
 <script>
 import firebase from 'firebase'
+import { db } from '../config/db'
 import store from '../config/store'
 import { validationMixin } from 'vuelidate'
-import {
-  required,
-  email,
-  minLength
-} from 'vuelidate/lib/validators'
 
 export default {
   name: 'app',
@@ -45,8 +21,34 @@ export default {
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.user = user
+        db.ref('editors').child(this.user.uid).get().then(snapshot => {
+          if (snapshot.exists()) {
+            db.ref('editors').child(this.user.uid).update({
+              name: this.user.displayName,
+              email: this.user.email,
+              id: this.user.uid,
+              profileUrl: this.user.photoURL
+            })
+          } else {
+            db.ref('editors').child(this.user.uid).update({
+              name: this.user.displayName,
+              email: this.user.email,
+              id: this.user.uid,
+              profileUrl: this.user.photoURL,
+              admin: false,
+              languages: {
+                en: {
+                  language: 'en',
+                  read: true,
+                  write: false
+                }
+              }
+            })
+          }
+        })
+        store.commit('setEditorId', this.user.uid)
         store.commit('login')
-        this.$router.push({ name: 'Home', params: {} })
+        this.$router.push({ name: 'links', params: {} })
       } else {
         store.commit('logout')
       }
@@ -62,18 +64,6 @@ export default {
       loginFailed: false,
       loading: true,
       user: null
-    }
-  },
-  validations: {
-    form: {
-      email: {
-        required,
-        email
-      },
-      password: {
-        required,
-        minLength: minLength(3)
-      }
     }
   },
   methods: {

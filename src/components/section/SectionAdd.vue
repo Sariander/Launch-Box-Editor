@@ -10,7 +10,7 @@
           <md-option value="video">Video</md-option>
           <md-option value="image">Image</md-option>
           <md-option value="link">Link</md-option>
-          <md-option value="setting">Setting</md-option>
+          <md-option v-if="editor && editor.admin" value="setting">Setting</md-option>
         </md-select>
       </md-field>
       <md-field>
@@ -25,13 +25,25 @@
         <label>Video Url</label>
         <md-textarea v-model="sectionItem.url"></md-textarea>
       </md-field>
-      <md-field v-if="sectionItem.type == 'image'">
-        <label>Image Url</label>
-        <md-textarea v-model="sectionItem.url"></md-textarea>
-      </md-field>
+      <span v-if="sectionItem.type == 'image'">
+        <div class="md-caption">Image</div>
+        <img :src="sectionItem.url" width="20%" />
+        <div v-if="!uploadEnd && !uploading">
+          <md-button class="md-primary" @click="selectFile">Upload Image</md-button>
+        </div>
+        <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
+        <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
+        <div v-if="uploadEnd">
+          <md-button class="md-accent" @click="deleteImage(false)">Delete Image</md-button>
+        </div>
+      </span>
       <md-field v-if="sectionItem.type == 'section'">
         <label>Section Name</label>
         <md-textarea v-model="sectionItem.sectionName"></md-textarea>
+      </md-field>
+      <md-field v-if="sectionItem.type == 'section'">
+        <label>Section Local Filename</label>
+        <md-textarea v-model="sectionItem.localUrl"></md-textarea>
       </md-field>
       <md-field v-if="sectionItem.type == 'link'">
         <label>Link Url</label>
@@ -82,7 +94,7 @@
 </template>
 
 <script>
-import { db } from '../../config/db'
+import { db, firestorage } from '../../config/db'
 import store from '../../config/store'
 
 export default {
@@ -93,6 +105,13 @@ export default {
   },
   data () {
     return {
+      progressUpload: 0,
+      fileName: '',
+      uploadTask: '',
+      uploading: false,
+      uploadEnd: false,
+      downloadURL: '',
+      editor: null,
       sectionItem: {
         header: '',
         type: 'section',
@@ -105,12 +124,73 @@ export default {
       if (this.sectionItem.order === undefined) {
         this.sectionItem.order = -1
       }
-      db.ref(store.getters.activeLanguageCode).child('section').child(this.sectionName).child('items').push(item)
+      db.ref('section').child(store.getters.activeLanguageCode).child(this.sectionName).child('items').push(item)
       this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
     },
     cancel: function () {
-      this.$router.replace({ name: 'section', params: { sectionName: this.sectionName } })
+      if (this.uploadEnd) {
+        this.deleteImage(true)
+      } else {
+        this.$router.go(-1)
+      }
+    },
+    selectFile () {
+      this.$refs.uploadInput.click()
+    },
+    detectFiles (e) {
+      const fileList = e.target.files || e.dataTransfer.files
+      Array.from(Array(fileList.length).keys()).map(x => {
+        this.upload(fileList[x])
+      })
+      e.target.value = ''
+    },
+    upload (file) {
+      this.fileName = file.name
+      this.uploading = true
+      this.uploadTask = firestorage.ref(this.sectionName + '/' + store.getters.activeLanguageCode + '/' + file.name).put(file)
+    },
+    deleteImage (navigate) {
+      firestorage
+        .ref(this.sectionName + '/' + store.getters.activeLanguageCode + '/' + this.fileName)
+        .delete()
+        .then(() => {
+          this.fileName = ''
+          this.progressUpload = 0
+          this.uploading = false
+          this.uploadEnd = false
+          this.downloadURL = ''
+          this.sectionItem.url = ''
+          if (navigate) {
+            this.$router.go(-1)
+          }
+        })
+        .catch((error) => {
+          console.error(`file delete error occured: ${error}`)
+        })
     }
+  },
+  watch: {
+    uploadTask: function () {
+      this.uploadTask.on('state_changed', sp => {
+        this.progressUpload = Math.floor(sp.bytesTransferred / sp.totalBytes * 100)
+      },
+      null,
+      () => {
+        this.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          this.uploadEnd = true
+          this.downloadURL = downloadURL
+          this.sectionItem.url = this.downloadURL
+          this.$emit('downloadURL', downloadURL)
+        })
+      })
+    }
+  },
+  mounted () {
+    this.$watch('user', () => {
+      this.$rtdbBind('editor', db.ref('editors').child(store.getters.editorId))
+    }, {
+      immediate: true
+    })
   }
 }
 </script>
@@ -164,5 +244,10 @@ export default {
 
 .md-tooltip {
   font-size: 12px;
+}
+
+input[type="file"] {
+  position: absolute;
+  clip: rect(0,0,0,0);
 }
 </style>

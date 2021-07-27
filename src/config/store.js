@@ -8,11 +8,19 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     isLoggedIn: false,
-    activeLanguageCode: 'en'
+    activeLanguageCode: 'en',
+    category: '',
+    seriesName: '',
+    lessonName: '',
+    editorId: ''
   },
   getters: {
     isLoggedIn: state => state.isLoggedIn,
-    activeLanguageCode: state => state.activeLanguageCode
+    activeLanguageCode: state => state.activeLanguageCode,
+    category: state => state.category,
+    seriesName: state => state.seriesName,
+    lessonName: state => state.lessonName,
+    editorId: state => state.editorId
   },
   mutations: {
     login (state) {
@@ -23,6 +31,18 @@ const store = new Vuex.Store({
     },
     setActiveLanguageCode (state, Language) {
       state.activeLanguageCode = Language
+    },
+    setCategory (state, category) {
+      state.category = category
+    },
+    setSeriesName (state, seriesName) {
+      state.seriesName = seriesName
+    },
+    setLessonName (state, lessonName) {
+      state.lessonName = lessonName
+    },
+    setEditorId (state, editorId) {
+      state.editorId = editorId
     }
   },
   plugins: [

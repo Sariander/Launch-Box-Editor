@@ -1,15 +1,12 @@
 <template>
   <div class="lesson">
-    <md-tabs :md-active-tab="currentTab" md-alignment="centered">
-    </md-tabs>
-    <span class=button-container>
+    <span class=button-container v-if="editor && editor.languages[activeLanguageCode].write">
       <md-switch v-model="canDrag">Reorder</md-switch>
-      <br>
       <md-switch v-model="editMode">Edit</md-switch>
     </span>
-    <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
+    <draggable v-model="displayListSorted" :disabled="!canDrag" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
-        <lesson-list-item @row-clicked="goToEdit(item.type, item['.key'])" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
+        <lesson-list-item @row-clicked="goToEdit(item.header, item.type, item['.key'])" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
@@ -34,8 +31,8 @@ export default {
   },
   props: {
     category: String,
-    seriesName: String,
-    lessonName: String,
+    seriesId: String,
+    lessonId: String,
     section: String
   },
   data () {
@@ -48,37 +45,50 @@ export default {
       studyRoute: '',
       leaderRoute: '',
       ideaRoute: '',
-      reviewRoute: ''
+      reviewRoute: '',
+      studyList: [],
+      editor: null
     }
   },
   computed: {
     displayListSorted: {
       get () {
-        let sorted = [...this.displayedList]
+        const sorted = [...this.displayedList]
 
         return sorted
       },
       set (value) {
-        let updates = {}
+        const updates = {}
         value.forEach((item, index) => {
-          db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').on('value', function (snapshot) {
+          db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').on('value', function (snapshot) {
             updates[item['.key'] + '/order'] = index
           })
         })
-        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').update(updates)
+        db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').update(updates)
+      }
+    },
+    activeLanguageCode: {
+      get () {
+        return store.getters.activeLanguageCode
+      },
+      set (newValue) {
+        store.commit('setActiveLanguageCode', newValue)
       }
     }
   },
-  firebase () {
-    return {
-      studyList: db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').orderByChild('order')
-    }
-  },
+  // firebase () {
+  //   return {
+  //     studyList: db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('studies').child(this.lessonId).child('study').orderByChild('order'),
+  //     leadersGuideList: db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('studies').child(this.lessonId).child('leadersGuide').orderByChild('order'),
+  //     ideaBoxList: db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('studies').child(this.lessonId).child('ideaBox').orderByChild('order'),
+  //     reviewCardsList: db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('reviewCards').orderByChild('order')
+  //   }
+  // },
   mounted () {
-    this.studyRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/study'
-    this.leaderRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/leadersGuide'
-    this.ideaRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/ideaBox'
-    this.reviewRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/reviewCards'
+    this.studyRoute = '/thrive/' + this.category + '/' + this.seriesId + '/' + this.lessonId + '/study'
+    this.leaderRoute = '/thrive/' + this.category + '/' + this.seriesId + '/' + this.lessonId + '/leadersGuide'
+    this.ideaRoute = '/thrive/' + this.category + '/' + this.seriesId + '/' + this.lessonId + '/ideaBox'
+    this.reviewRoute = '/thrive/' + this.category + '/' + this.seriesId + '/' + this.lessonId + '/reviewCards'
     this.$watch('section', () => {
       switch (this.section) {
         case 'study':
@@ -102,22 +112,58 @@ export default {
     }, {
       immediate: true
     })
+    this.$watch('activeLanguageCode', () => {
+      db.ref('header').child(store.getters.activeLanguageCode).child(this.section).on('value', snapshot => {
+        this.headerImageUrl = snapshot.val()
+      })
+      this.$rtdbBind('studyList', db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').orderByChild('order'))
+      switch (this.section) {
+        case 'study':
+          this.currentTab = 'study'
+          this.displayedList = this.studyList
+          break
+        case 'leadersGuide':
+          this.currentTab = 'leaders'
+          this.displayedList = this.leadersGuideList
+          break
+        case 'ideaBox':
+          this.currentTab = 'idea'
+          this.displayedList = this.ideaBoxList
+          break
+        case 'reviewCards':
+          this.currentTab = 'review'
+          this.displayedList = this.reviewCardsList
+          break
+        default:
+      }
+    }, {
+      immediate: true
+    })
+    this.$watch('user', () => {
+      if (store.getters.editorId) {
+        this.$rtdbBind('editor', db.ref('editors').child(store.getters.editorId))
+      }
+    }, {
+      immediate: true
+    })
   },
   methods: {
     goToAdd: function () {
-      this.$router.replace({ name: 'itemAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, order: this.displayListSorted.length } })
+      if (this.editor.languages[this.activeLanguageCode].write) {
+        this.$router.push({ name: 'itemAdd', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, sectionName: this.section, order: this.displayListSorted.length } })
+      }
     },
-    goToEdit (type, key) {
+    goToEdit (header, type, key) {
       if (!this.canDrag) {
         if (this.editMode) {
-          this.$router.replace({ name: 'itemEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.section, lessonItemKey: key } })
+          this.$router.push({ name: 'itemEdit', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, sectionName: 'study', lessonItemKey: key } })
         } else if (type === 'text') {
-          this.$router.push({name: 'question', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: 'study', questionItemKey: key }})
+          this.$router.push({ name: 'question', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, sectionName: 'study', questionItemKey: key } })
         }
       }
     },
     changeTab (newSection) {
-      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, section: newSection } })
+      this.$router.replace({ name: 'lesson', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, section: newSection } })
     }
   }
 }
@@ -127,6 +173,49 @@ export default {
 .content-container {
   width: 60%;
   margin: 0 auto;
+  padding: 0 4px;
+}
+
+.item-edit {
+  cursor: pointer;
+}
+
+.no-edit {
+  cursor: auto;
+}
+
+@media only screen and (max-width: 600px) {
+  .content-container {
+    width: 100%;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .content-container {
+    width: 100%;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .content-container {
+    width: 75%;
+  }
+}
+
+@media only screen and (min-width: 992px) {
+  .content-container {
+    width: 60%;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  .content-container {
+    width: 50%;
+  }
+}
+.item-container {
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 .md-dialog {
   width: 60%;
@@ -134,6 +223,8 @@ export default {
   padding-right: 10px;
 }
 .button-container {
+  display: flex;
+  flex-direction: column;
   position: fixed;
   right: 0;
   top: 64px;

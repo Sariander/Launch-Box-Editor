@@ -1,6 +1,6 @@
 <template>
   <div class="lessonListItem">
-    <div v-on:click="onRowClicked()" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
+    <div v-on:click="onRowClicked()" class="item-container" v-bind:class="[{'no-edit': !canEdit }, canDrag ? 'item-drag' : 'item-edit']">
       <template v-if="item.type == 'text'">
         <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights, item.headerColoredHighlights, item.headerLinkHighlights)"></div>
         <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
@@ -29,7 +29,9 @@ export default {
   props: {
     item: Object,
     canDrag: Boolean,
-    hasDivider: Boolean
+    hasDivider: Boolean,
+    activeLanguageCode: String,
+    canEdit: Boolean
   },
   methods: {
     highlight (content, highlights, coloredHighlights, linkHighlights) {
@@ -57,7 +59,9 @@ export default {
       return content
     },
     onRowClicked () {
-      this.$emit('row-clicked', this.item['.key'])
+      if (this.canEdit) {
+        this.$emit('row-clicked', this.item['.key'])
+      }
     }
   }
 }
@@ -91,9 +95,14 @@ export default {
 .item-drag {
   cursor: move;
 }
+.no-edit {
+  cursor: auto;
+}
 .item-container {
   margin-top: 10px;
   margin-bottom: 5px;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 .material-divider {
   display: block;
@@ -101,4 +110,3 @@ export default {
   background-color: rgba(0, 0, 0, 0.12);
 }
 </style>
-

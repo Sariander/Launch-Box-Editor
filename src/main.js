@@ -1,18 +1,26 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import VueFire from 'vuefire'
-import App from './App'
+import App from './App.vue'
+import './registerServiceWorker'
 import router from './router'
+import store from './store'
+
+import { rtdbPlugin as VueFire } from 'vuefire'
 
 Vue.use(VueFire)
 
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
+Vue.config.errorHandler = (err, vm, info) => {
+  if (process.env.NODE_ENV !== 'production') {
+    // Show any error but this one
+    if (err.message !== "Cannot read property 'badInput' of undefined") {
+      console.error(err)
+    }
+  }
+}
+
 new Vue({
-  el: '#app',
   router,
-  template: '<App/>',
-  components: { App }
-})
+  store,
+  render: h => h(App)
+}).$mount('#app')

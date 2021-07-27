@@ -2,14 +2,15 @@
   <div class="lessonListItem">
     <div v-on:click="onRowClicked()" class="item-container" v-bind:class="canDrag ? 'item-drag' : 'item-edit'">
       <template v-if="item.type == 'checklist'">
-        <div> {{ item.header }} </div>
-        <span v-for="check of item.list" :key="check.id">
+        <div class="subtitle"> {{ item.header }} </div>
+        <ul>
+        <li v-for="check of item.list" :key="check.id">
           <div> {{ check.title }}</div>
-        </span>
+        </li>
+        </ul>
       </template>
       <template v-if="item.type == 'text'">
-        <div v-bind:class="item.style" v-html="highlight(item.header, item.headerHighlights, item.headerColoredHighlights)"></div>
-        <div v-if="item.style == 'detail' && item.details && item.details != ''">{{ item.details }}</div>
+        <div class="bold">{{item.header}}</div>
       </template>
     </div>
     <span class="material-divider" v-if="hasDivider"></span>
@@ -49,6 +50,10 @@ export default {
 </script>
 
 <style scoped>
+ul {
+  list-style-type: square;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -86,4 +91,3 @@ export default {
   background-color: rgba(0, 0, 0, 0.12);
 }
 </style>
-

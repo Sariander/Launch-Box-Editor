@@ -1,14 +1,11 @@
 <template>
   <div class="lesson">
-    <md-tabs :md-active-tab="currentTab" md-alignment="centered">
-    </md-tabs>
-    <span class=button-container>
+    <span class=button-container v-if="editor && editor.languages[activeLanguageCode].write">
       <md-switch v-model="canDrag">Reorder</md-switch>
-      <br>
     </span>
-    <draggable v-model="displayListSorted" :options="{disabled: !canDrag}" class="content-container">
+    <draggable v-model="displayListSorted" :disabled="!canDrag" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
-        <lesson-list-item @row-clicked="goToEdit" :item="item" :canDrag="canDrag" :hasDivider="index != displayedList.length-1"></lesson-list-item>
+        <lesson-list-item @row-clicked="goToEdit" :item="item" :canEdit="editor.languages[activeLanguageCode].write" :canDrag="canDrag" :hasDivider="index != displayedList.length-1" :activeLanguageCode="activeLanguageCode"></lesson-list-item>
       </div>
     </draggable>
     <md-speed-dial class="md-bottom-right">
@@ -33,8 +30,8 @@ export default {
   },
   props: {
     category: String,
-    seriesName: String,
-    lessonName: String,
+    seriesId: String,
+    lessonId: String,
     sectionName: String,
     questionItemKey: String
   },
@@ -45,46 +42,63 @@ export default {
       editMode: false,
       lessonItems: [],
       displayedList: [],
+      studyList: [],
       studyRoute: '',
       leaderRoute: '',
       ideaRoute: '',
-      reviewRoute: ''
+      reviewRoute: '',
+      editor: null
     }
   },
   computed: {
     displayListSorted: {
       get () {
-        let sorted = [...this.displayedList]
+        const sorted = [...this.displayedList]
 
         return sorted
       },
       set (value) {
-        let updates = {}
+        const updates = {}
         value.forEach((item, index) => {
-          db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').on('value', function (snapshot) {
+          db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').on('value', function (snapshot) {
             updates[item['.key'] + '/order'] = index
           })
         })
-        db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').update(updates)
+        db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').update(updates)
+      }
+    },
+    activeLanguageCode: {
+      get () {
+        return store.getters.activeLanguageCode
+      },
+      set (newValue) {
+        store.commit('setActiveLanguageCode', newValue)
       }
     }
   },
   firebase () {
     return {
-      studyList: db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).child('chapters').child(this.lessonName).child('study').child(this.questionItemKey).child('list').orderByChild('order')
+      studyList: db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('chapters').child(this.lessonId).child('study').child(this.questionItemKey).child('list').orderByChild('order')
     }
   },
   mounted () {
-    this.studyRoute = '/thrive/' + this.category + '/' + this.seriesName + '/' + this.lessonName + '/study'
+    this.$watch('user', () => {
+      if (store.getters.editorId) {
+        this.$rtdbBind('editor', db.ref('editors').child(store.getters.editorId))
+      }
+    }, {
+      immediate: true
+    })
+    this.studyRoute = '/thrive/' + this.category + '/' + this.seriesId + '/' + this.lessonId + '/study'
     this.displayedList = this.studyList
   },
   methods: {
     goToAdd: function () {
-      this.$router.replace({ name: 'questionAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.sectionName, questionItemKey: this.questionItemKey, order: this.displayListSorted.length } })
+      this.$router.push({ name: 'questionAdd', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.sectionName, questionItemKey: this.questionItemKey, order: this.displayListSorted.length } })
     },
     goToEdit (key) {
       if (!this.canDrag) {
-        this.$router.replace({ name: 'questionEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.sectionName, questionItemKey: this.questionItemKey, questionKey: key } })
+        this.$router.push({ name: 'questionEdit', params: { category: this.category, seriesName: this.seriesName, lessonName: this.lessonName, sectionName: this.sectionName, questionItemKey: this.questionItemKey, questionKey: key } })
       }
     },
     changeTab (newSection) {

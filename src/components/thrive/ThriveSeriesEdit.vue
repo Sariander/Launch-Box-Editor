@@ -2,76 +2,41 @@
   <div class="seriesAdd">
     <div class="content-container">
       <md-card-actions>
-        <md-button class="md-accent" @click="confirmDialogActive = true">Remove Series</md-button>
+        <md-button class="md-accent" @click="confirmDialogActive = true">Remove Section</md-button>
       </md-card-actions>
-      <span class="md-caption">Section Title</span>
-        <br>
-        <span class="md-subheading">{{seriesItem.title}}</span>
-      <md-field>
-        <label>Section Header Image Url</label>
-        <md-input v-model="seriesItem.image"></md-input>
-      </md-field>
-      <md-field>
-        <label>Local Section Header Image Filename</label>
-        <md-input v-model="seriesItem.localImage"></md-input>
-      </md-field>
-      <md-field>
-        <label>Section Video Image Url</label>
-        <md-input v-model="seriesItem.video"></md-input>
-      </md-field>
-      <md-field>
-        <label>Local Section Video Image Filename</label>
-        <md-input v-model="seriesItem.localVideo"></md-input>
-      </md-field>
-      <md-field>
-        <label>Section Youtube Video ID</label>
-        <md-input v-model="seriesItem.videoID"></md-input>
-      </md-field>
-      <md-field>
-        <label>Summary</label>
-        <md-textarea v-model="seriesItem.summary"></md-textarea>
-      </md-field>
+      <span v-if="seriesItem">
+        <md-field>
+          <label>Section Title</label>
+          <md-input v-model="seriesItem.title"></md-input>
+        </md-field>
+        <div class="md-caption">Section Image</div>
+        <img :src="seriesItem.image" width="20%" />
+        <div class="md-layout md-alignment-center-left md-layout-item" v-if="!uploadEnd && !uploading">
+          <md-button class="md-primary" @click="selectFile">Upload New Image</md-button>
+          <span class="md-layout-item md-size-2">
+            <md-icon class="far fa-question-circle"></md-icon>
+            <md-tooltip md-direction="right">Tooltip</md-tooltip>
+          </span>
+        </div>
+        <input id="files" type="file" name="file" ref="uploadInput" accept="image/*" :multiple="false" @change="detectFiles($event)"/>
+        <md-progress-bar v-if="uploading && !uploadEnd" md-mode="determinate" :md-value="progressUpload"></md-progress-bar>
+        <div v-if="uploadEnd">
+          <md-button class="md-accent" @click="deleteImage(false)">Revert To Previous Image</md-button>
+        </div>
+        <md-field>
+          <label>Local Section Image Filename</label>
+          <md-input v-model="seriesItem.localImage"></md-input>
+        </md-field>
+      </span>
       <md-card-actions>
         <md-button @click="cancel()">Cancel</md-button>
-        <md-button class="md-primary" @click="showTitleChangeDialog()">Change Series Title</md-button>
         <md-button class="md-primary" @click="updateSeries(seriesItem)">Save</md-button>
       </md-card-actions>
       <md-dialog :md-active.sync="confirmDialogActive">
-        <md-dialog-title>Are you sure you want to remove this series?</md-dialog-title>
+        <md-dialog-title>Are you sure you want to remove this section?</md-dialog-title>
         <md-dialog-actions>
           <md-button @click="confirmDialogActive = false">Cancel</md-button>
           <md-button class="md-accent" @click="removeSeries()">Confirm</md-button>
-        </md-dialog-actions>
-      </md-dialog>
-      <md-dialog :md-active.sync="changeDialogActive">
-        <md-dialog-title>Change the category of this series</md-dialog-title>
-        <md-dialog-content>
-          <md-field>
-            <label for="category">Category</label>
-              <md-select v-model="tempCategory" name="category" id="category">
-                <md-option value="follow-up">Follow Up</md-option>
-                <md-option value="thrive-1">Thrive 1</md-option>
-                <md-option value="thrive-2">Thrive 2</md-option>
-                <md-option value="thrive-3">Thrive 3</md-option>
-              </md-select>
-          </md-field>
-        </md-dialog-content>
-        <md-dialog-actions>
-          <md-button @click="changeDialogActive = false">Cancel</md-button>
-          <md-button class="md-primary" @click="changeCategory(seriesItem)">Confirm</md-button>
-        </md-dialog-actions>
-      </md-dialog>
-      <md-dialog :md-active.sync="titleDialogActive">
-        <md-dialog-title>Change the title of this series</md-dialog-title>
-        <md-dialog-content>
-          <md-field>
-            <label>Series Title</label>
-            <md-input v-model="tempName"></md-input>
-          </md-field>
-        </md-dialog-content>
-        <md-dialog-actions>
-          <md-button @click="titleDialogActive = false">Cancel</md-button>
-          <md-button class="md-primary" @click="changeSeriesTitle(seriesItem)">Confirm</md-button>
         </md-dialog-actions>
       </md-dialog>
     </div>
@@ -79,87 +44,162 @@
 </template>
 
 <script>
-import { db } from '../../config/db'
+import { db, firestorage } from '../../config/db'
 import store from '../../config/store'
 
 export default {
   props: {
     category: String,
-    seriesName: String
+    seriesId: String
   },
   data () {
     return {
+      progressUpload: 0,
+      fileName: '',
+      uploadTask: '',
+      uploading: false,
+      uploadEnd: false,
+      downloadURL: '',
       confirmDialogActive: false,
-      changeDialogActive: false,
-      titleDialogActive: false,
       seriesItem: {
         title: '',
         image: '',
         localImage: '',
         video: '',
         localVideo: '',
-        videoID: '',
         category: '',
         order: '',
         summary: ''
       },
-      tempCategory: this.category,
-      tempName: ''
+      tempCategory: this.category
+    }
+  },
+  computed: {
+    activeLanguageCode: {
+      get () {
+        return store.getters.activeLanguageCode
+      },
+      set (newValue) {
+        store.commit('setActiveLanguageCode', newValue)
+      }
     }
   },
   methods: {
     updateSeries: function (item) {
-      this.seriesItem.videoID = this.YouTubeGetID(this.seriesItem.videoID)
+      this.prepareItemForSending()
       // create a copy of the item
       const copy = { ...item }
       // remove the .key attribute
       delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).set(copy)
+      db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).set(copy)
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     removeSeries: function () {
-      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).remove()
+      db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).remove()
       this.$router.push({ name: 'thrive', params: { category: this.category } })
     },
     showCategoryDialog: function () {
       this.tempCategory = this.category
       this.changeDialogActive = true
     },
-    showTitleChangeDialog: function () {
-      this.titleDialogActive = true
-      this.tempName = this.seriesItem.title
-    },
-    changeSeriesTitle: function (item) {
-      this.seriesItem.title = this.tempName
-      var futureTitle = this.tempName.replace(/\s+/g, '-').toLowerCase()
-      // create a copy of the item
-      const copy = { ...item }
-      // remove the .key attribute
-      delete copy['.key']
-      db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName).remove()
-      db.ref(store.getters.activeLanguageCode).child('launch').child(futureTitle).set(copy)
-      this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
-    },
-    YouTubeGetID (url) {
-      var ID = ''
-      url = url.replace(/(>|<)/gi, '').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/)
-      console.log(url)
-      if (url[2] !== undefined) {
-        ID = url[2].split(/[^0-9a-z_-]/i)
-        ID = ID[0]
-      } else if (url[0] !== undefined) {
-        ID = url[0]
-      } else {
-        ID = url
-      }
-      return ID
-    },
+    // changeCategory: function (item) {
+    //   // create a copy of the item
+    //   const copy = { ...item }
+    //   // remove the .key attribute
+    //   delete copy['.key']
+    //   db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).remove()
+    //   db.ref('series').child(store.getters.activeLanguageCode).child(this.tempCategory).child(this.seriesId).set(copy)
+    //   this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
+    // },
+    // showTitleChangeDialog: function () {
+    //   this.titleDialogActive = true
+    //   this.tempName = this.seriesItem.title
+    // },
+    // changeSeriesTitle: function (item) {
+    //   this.seriesItem.title = this.tempName
+    //   var futureTitle = this.tempName.replace(/\s+/g, '-').toLowerCase()
+    //   // create a copy of the item
+    //   const copy = { ...item }
+    //   // remove the .key attribute
+    //   delete copy['.key']
+    //   db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).remove()
+    //   db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(futureTitle).set(copy)
+    //   this.$router.push({ name: 'thrive', params: { category: this.tempCategory } })
+    // },
     cancel: function () {
-      this.$router.go(-1)
+      if (this.uploadEnd) {
+        this.deleteImage(true)
+      } else {
+        this.$router.go(-1)
+      }
+    },
+    selectFile () {
+      this.$refs.uploadInput.click()
+    },
+    detectFiles (e) {
+      const fileList = e.target.files || e.dataTransfer.files
+      Array.from(Array(fileList.length).keys()).map(x => {
+        this.upload(fileList[x])
+      })
+      e.target.value = ''
+    },
+    upload (file) {
+      this.fileName = file.name
+      this.uploading = true
+      this.uploadTask = firestorage.ref(this.seriesId + '/' + store.getters.activeLanguageCode + '/' + file.name).put(file)
+    },
+    deleteImage (navigate) {
+      firestorage
+        .ref(this.seriesId + '/' + store.getters.activeLanguageCode + '/' + this.fileName)
+        .delete()
+        .then(() => {
+          this.fileName = ''
+          this.progressUpload = 0
+          this.uploading = false
+          this.uploadEnd = false
+          this.downloadURL = ''
+          if (!navigate) {
+            db.ref('series').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId).child('image').once('value', snapshot => {
+              this.seriesItem.image = snapshot.val()
+            })
+          }
+          if (navigate) {
+            this.$router.go(-1)
+          }
+        })
+        .catch((error) => {
+          console.error(`file delete error occured: ${error}`)
+        })
+    },
+    prepareItemForSending () {
+      this.seriesItem.title = this.seriesItem.title || ''
+      this.seriesItem.localImage = this.seriesItem.localImage || ''
+      this.seriesItem.image = this.seriesItem.image || ''
+      this.seriesItem.printUrl = this.seriesItem.printUrl || ''
+    }
+  },
+  watch: {
+    uploadTask: function () {
+      this.uploadTask.on('state_changed', sp => {
+        this.progressUpload = Math.floor(sp.bytesTransferred / sp.totalBytes * 100)
+      },
+      null,
+      () => {
+        this.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => {
+          this.uploadEnd = true
+          this.downloadURL = downloadURL
+          this.seriesItem.image = this.downloadURL
+          this.$emit('downloadURL', downloadURL)
+        })
+      })
     }
   },
   mounted () {
-    this.$bindAsObject('seriesItem', db.ref(store.getters.activeLanguageCode).child('launch').child(this.seriesName))
+    this.$watch('activeLanguageCode', () => {
+      this.$rtdbBind('seriesItem', db.ref('section').child(store.getters.activeLanguageCode).child(this.category).child(this.seriesId))
+    }, {
+      immediate: true
+    })
   }
 }
 </script>
@@ -194,6 +234,11 @@ export default {
 .content-container {
   width: 80%;
   margin: 0 auto;
+}
+
+input[type="file"] {
+  position: absolute;
+  clip: rect(0,0,0,0);
 }
 
 </style>
