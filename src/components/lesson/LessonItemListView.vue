@@ -158,6 +158,7 @@ export default {
         if (this.editMode) {
           this.$router.push({ name: 'itemEdit', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, sectionName: 'study', lessonItemKey: key } })
         } else if (type === 'text') {
+          store.commit('setArticleName', header)
           this.$router.push({ name: 'question', params: { category: this.category, seriesId: this.seriesId, lessonId: this.lessonId, sectionName: 'study', questionItemKey: key } })
         }
       }

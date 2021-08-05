@@ -12,6 +12,7 @@ const store = new Vuex.Store({
     category: '',
     seriesName: '',
     lessonName: '',
+    articleName: '',
     editorId: ''
   },
   getters: {
@@ -20,6 +21,7 @@ const store = new Vuex.Store({
     category: state => state.category,
     seriesName: state => state.seriesName,
     lessonName: state => state.lessonName,
+    articleName: state => state.articleName,
     editorId: state => state.editorId
   },
   mutations: {
@@ -40,6 +42,9 @@ const store = new Vuex.Store({
     },
     setLessonName (state, lessonName) {
       state.lessonName = lessonName
+    },
+    setArticleName (state, articleName) {
+      state.articleName = articleName
     },
     setEditorId (state, editorId) {
       state.editorId = editorId

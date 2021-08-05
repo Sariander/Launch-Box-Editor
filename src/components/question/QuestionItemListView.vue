@@ -3,6 +3,7 @@
     <span class=button-container v-if="editor && editor.languages[activeLanguageCode].write">
       <md-switch v-model="canDrag">Reorder</md-switch>
     </span>
+    <div class="header-container title">{{ header }}</div>
     <draggable v-model="displayListSorted" :disabled="!canDrag" class="content-container">
       <div v-for="(item, index) of displayListSorted" :key="item['.key']">
         <lesson-list-item @row-clicked="goToEdit" :item="item" :canEdit="editor.languages[activeLanguageCode].write" :canDrag="canDrag" :hasDivider="index != displayedList.length-1" :activeLanguageCode="activeLanguageCode"></lesson-list-item>
@@ -74,6 +75,14 @@ export default {
       set (newValue) {
         store.commit('setActiveLanguageCode', newValue)
       }
+    },
+    header: {
+      get () {
+        return store.getters.articleName
+      },
+      set (newValue) {
+        store.commit('setArticleName', newValue)
+      }
     }
   },
   firebase () {
@@ -113,6 +122,10 @@ export default {
   width: 60%;
   margin: 0 auto;
 }
+.header-container {
+  width: 60%;
+  margin: 10px auto 5px auto;
+}
 .md-dialog {
   width: 60%;
   padding-left: 10px;
@@ -122,5 +135,10 @@ export default {
   position: fixed;
   right: 0;
   top: 64px;
+}
+.title {
+  font-size: 22px;
+  font-weight: bold;
+  color: gold;
 }
 </style>

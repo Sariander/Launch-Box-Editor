@@ -1009,13 +1009,13 @@ export default {
           this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / Add Item'
           break
         case 'question':
-          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Question'
+          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Article'
           break
         case 'questionEdit':
-          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Question' + ' / Edit Item'
+          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Article' + ' / Edit Item'
           break
         case 'questionAdd':
-          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Question' + ' / Add Item'
+          this.title = store.getters.category + ' / ' + store.getters.seriesName + ' / ' + store.getters.lessonName + ' / ' + 'Article' + ' / Add Item'
           break
         default:
       }
