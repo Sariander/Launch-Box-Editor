@@ -1,5 +1,13 @@
 <template>
   <div class="home" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
+    <span class="ad-edit-container-right">
+      <img @click="goToEditAdOne()" class="ad-edit-button" :src="(adUrlOne != '' && adUrlOne != null) ? adUrlOne : require('../../src/assets/placeholder.png')" v-bind:class="{'item-edit': editor && editor.languages[this.activeLanguageCode].write}">
+      <img @click="goToEditAdTwo()" class="ad-edit-button" :src="(adUrlTwo != '' && adUrlTwo != null) ? adUrlTwo : require('../../src/assets/placeholder.png')" v-bind:class="{'item-edit': editor && editor.languages[this.activeLanguageCode].write}">
+    </span>
+    <span class="ad-edit-container-left">
+      <img @click="goToEditAdThree()" class="ad-edit-button" :src="(adUrlThree != '' && adUrlThree != null) ? adUrlThree : require('../../src/assets/placeholder.png')" v-bind:class="{'item-edit': editor && editor.languages[this.activeLanguageCode].write}">
+      <img @click="goToEditAdFour()" class="ad-edit-button" :src="(adUrlFour != '' && adUrlFour != null) ? adUrlFour : require('../../src/assets/placeholder.png')" v-bind:class="{'item-edit': editor && editor.languages[this.activeLanguageCode].write}">
+    </span>
     <!-- <div class="content-container">
       <span>
         <md-button
@@ -12,10 +20,10 @@
           @click="goToSection('leading')"
         >{{ buttonText[activeLanguageCode].lead }}</md-button>
       </span>
-    </div>
+    </div> -->
     <span class=button-container v-if="editor && editor.languages[activeLanguageCode].write">
       <md-button class="md-raised" @click="goToEditBackground()">{{ buttonText[activeLanguageCode].background }}</md-button>
-    </span> -->
+    </span>
   </div>
 </template>
 
@@ -29,6 +37,8 @@ export default {
       backgroundUrl: '',
       adUrlOne: '',
       adUrlTwo: '',
+      adUrlThree: '',
+      adUrlFour: '',
       editor: null,
       buttonText: {
         en: {
@@ -83,6 +93,16 @@ export default {
         this.$router.push({ name: 'ad-edit-two' })
       }
     },
+    goToEditAdThree () {
+      if (this.editor && this.editor.languages[this.activeLanguageCode].write) {
+        this.$router.push({ name: 'ad-edit-three' })
+      }
+    },
+    goToEditAdFour () {
+      if (this.editor && this.editor.languages[this.activeLanguageCode].write) {
+        this.$router.push({ name: 'ad-edit-four' })
+      }
+    },
     goToEditBackground () {
       this.$router.push({ name: 'background-edit' })
     }
@@ -116,6 +136,20 @@ export default {
     }, {
       immediate: true
     })
+    this.$watch('activeLanguageCode', () => {
+      db.ref('home').child(store.getters.activeLanguageCode).child('three').child('adUrl').once('value', snapshot => {
+        this.adUrlThree = snapshot.val()
+      })
+    }, {
+      immediate: true
+    })
+    this.$watch('activeLanguageCode', () => {
+      db.ref('home').child(store.getters.activeLanguageCode).child('four').child('adUrl').once('value', snapshot => {
+        this.adUrlFour = snapshot.val()
+      })
+    }, {
+      immediate: true
+    })
   }
 }
 </script>
@@ -131,10 +165,10 @@ export default {
   /* Center and scale the image nicely */
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
 }
 
-.ad-edit-container {
+.ad-edit-container-right {
   position: absolute;
   right: 0;
   top: 64px;
@@ -144,7 +178,17 @@ export default {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none; */
+}
 
+.ad-edit-container-left {
+  position: absolute;
+  top: 64px;
+  min-width: 250px;
+  max-width: 20%;
+  /* -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none; */
 }
 
 .ad-edit-button {
@@ -159,7 +203,10 @@ export default {
   .home {
     height: calc(100vh - 56px);
   }
-  .ad-edit-container {
+  .ad-edit-container-right {
+    top: 56px;
+  }
+  .ad-edit-container-left {
     top: 56px;
   }
 }
@@ -168,7 +215,10 @@ export default {
   .home {
     height: calc(100vh - 48px);
   }
-  .ad-edit-container {
+  .ad-edit-container-right {
+    top: 48px;
+  }
+  .ad-edit-container-left {
     top: 48px;
   }
 }
@@ -177,7 +227,10 @@ export default {
   .home {
     height: calc(100vh - 48px);
   }
-  .ad-edit-container {
+  .ad-edit-container-right {
+    top: 48px;
+  }
+  .ad-edit-container-left {
     top: 48px;
   }
 }
@@ -186,7 +239,10 @@ export default {
   .home {
     height: calc(100vh - 64px);
   }
-  .ad-edit-container {
+  .ad-edit-container-right {
+    top: 64px;
+  }
+  .ad-edit-container-left {
     top: 64px;
   }
 }
@@ -195,7 +251,10 @@ export default {
   .home {
     height: calc(100vh - 64px);
   }
-  .ad-edit-container {
+  .ad-edit-container-right {
+    top: 64px;
+  }
+  .ad-edit-container-left {
     top: 64px;
   }
 }

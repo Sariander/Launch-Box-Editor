@@ -7,12 +7,12 @@
           <md-icon>menu</md-icon>
         </md-button>
         <span class="md-title app-title">{{ title }}</span>
-        <!-- <md-field class="md-layout-item skinny-dropdown" v-if="isLoggedIn && languageDropdown != null && this.$route.name !='itemAdd' && this.$route.name !='itemEdit'">
+        <md-field class="md-layout-item skinny-dropdown" v-if="isLoggedIn && languageDropdown != null && this.$route.name !='itemAdd' && this.$route.name !='itemEdit'">
           <md-select v-if="editor" v-on:click.stop="stopEvent" :name="languageDropdown.title" :id="languageDropdown.title" v-model="activeLanguageCode">
             <md-option v-for="subItem of languageDropdown" :key="subItem['.key']" :value="subItem.language" :disabled="editor.languages[subItem.language] && !editor.languages[subItem.language].read">{{ isoLangs[subItem.language].nativeName }} ({{ isoLangs[subItem.language].name }})</md-option>
           </md-select>
-        </md-field> -->
-        <!-- <span class="md-subheading" v-if="this.$route.name =='itemAdd' || this.$route.name =='itemEdit'">{{ isoLangs[activeLanguageCode].nativeName }} ({{ isoLangs[activeLanguageCode].name }})</span> -->
+        </md-field>
+        <span class="md-subheading" v-if="this.$route.name =='itemAdd' || this.$route.name =='itemEdit'">{{ isoLangs[activeLanguageCode].nativeName }} ({{ isoLangs[activeLanguageCode].name }})</span>
         <md-avatar v-if="editor && isLoggedIn">
           <img v-bind:src="editor.profileUrl">
         </md-avatar>
@@ -46,10 +46,10 @@
             <md-icon :class="this.$route.name == 'editors' ? 'active-item' : 'black-icon'">account_circle</md-icon>
             <span class="md-list-item-text">Editors</span>
           </md-list-item>
-          <!-- <md-list-item v-if="editor && editor.admin" @click="navigateToTab('languages', null)">
+          <md-list-item v-if="editor && editor.admin" @click="navigateToTab('languages', null)">
             <md-icon :class="this.$route.name == 'languages' ? 'active-item' : 'black-icon'">language</md-icon>
             <span class="md-list-item-text">Languages</span>
-          </md-list-item> -->
+          </md-list-item>
         </md-list>
       </md-app-drawer>
 

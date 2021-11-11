@@ -20,6 +20,12 @@
                   <md-input v-model="item.title"></md-input>
                 </md-field>
               </span>
+              <span class="title-field">
+                <md-field>
+                  <label>Prompt Header</label>
+                  <md-input v-model="item.header"></md-input>
+                </md-field>
+              </span>
             </md-card-content>
             <md-card-actions class="actions">
               <md-switch v-model="item.enabled" class="md-primary">Language Enabled</md-switch>
@@ -52,6 +58,10 @@
             <md-input v-model="newOptionTitle"></md-input>
           </md-field>
           <md-field>
+            <label>Prompt Header</label>
+            <md-input v-model="newOptionHeader"></md-input>
+          </md-field>
+          <md-field>
             <label>Language Code</label>
             <md-input v-model="newOptionValue"></md-input>
           </md-field>
@@ -73,6 +83,7 @@ export default {
     return {
       languages: null,
       newOptionTitle: '',
+      newOptionHeader: '',
       newOptionValue: '',
       optionDialogActive: false,
       confirmDialogActive: false,
@@ -816,29 +827,41 @@ export default {
   methods: {
     openOptionDialog: function () {
       this.newOptionTitle = ''
+      this.newOptionHeader = ''
       this.newOptionValue = ''
       this.optionDialogActive = true
     },
     clearOptionFieldsAndClose: function () {
       this.newOptionTitle = ''
+      this.newOptionHeader = ''
       this.newOptionValue = ''
       this.optionDialogActive = false
     },
     addOptionItem: function () {
       var languageData = {
         title: this.newOptionTitle,
+        header: this.newOptionHeader,
         language: this.newOptionValue,
         enabled: false
       }
-      db.ref('languages').once('value', snapshot => {
-        if (!snapshot.exists()) {
-          db.ref('languages').set('')
-        }
-      })
-      db.ref('languages').child(this.newOptionValue).set(languageData).then(_ => {
-        this.optionDialogActive = false
-        this.addEditorLanguage(this.newOptionValue)
-      })
+      if (this.newOptionValue !== '') {
+        db.ref('languages').once('value', snapshot => {
+          if (!snapshot.exists()) {
+            db.ref('languages').set('')
+          }
+        })
+        db.ref('section').child('en').once('value', snapshot => {
+          if (snapshot.exists()) {
+            const copy = { ...snapshot.val() }
+            delete copy['.key']
+            db.ref('section').child(this.newOptionValue).set(copy)
+          }
+        })
+        db.ref('languages').child(this.newOptionValue).set(languageData).then(_ => {
+          this.optionDialogActive = false
+          this.addEditorLanguage(this.newOptionValue)
+        })
+      }
     },
     removeItem (index) {
       this.removeIndex = index
@@ -889,7 +912,7 @@ export default {
 }
 
 .title-field {
-  flex-basis: 70%;
+  flex-basis: 40%;
 }
 
 .code-field {
@@ -916,7 +939,7 @@ export default {
     flex-wrap: wrap;
   }
   .title-field {
-    flex-basis: 50%;
+    flex-basis: 25%;
   }
 }
 
@@ -928,7 +951,7 @@ export default {
     flex-wrap: nowrap;
   }
   .title-field {
-    flex-basis: 50%;
+    flex-basis: 25%;
   }
 }
 
@@ -940,7 +963,7 @@ export default {
     flex-wrap: nowrap;
   }
   .title-field {
-    flex-basis: 50%;
+    flex-basis: 30%;
   }
 }
 
@@ -952,7 +975,7 @@ export default {
     flex-wrap: nowrap;
   }
   .title-field {
-    flex-basis: 70%;
+    flex-basis: 33%;
   }
 }
 
@@ -964,7 +987,7 @@ export default {
     flex-wrap: nowrap;
   }
   .title-field {
-    flex-basis: 70%;
+    flex-basis: 35%;
   }
 }
 

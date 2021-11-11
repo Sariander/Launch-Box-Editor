@@ -19,6 +19,10 @@ import SectionAdd from '@/components/section/SectionAdd'
 import Links from '@/components/Links'
 import Editors from '@/components/Editors'
 import EditorsEdit from '@/components/EditorsEdit'
+import AdEditOne from '@/components/AdEditOne'
+import AdEditTwo from '@/components/AdEditTwo'
+import AdEditThree from '@/components/AdEditThree'
+import AdEditFour from '@/components/AdEditFour'
 import BackgroundEdit from '@/components/BackgroundEdit'
 import Languages from '@/components/Languages'
 import HeaderEdit from '@/components/HeaderEdit'
@@ -79,6 +83,38 @@ const routes = [
     name: 'editorsEdit',
     component: EditorsEdit,
     props: true,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/ad-edit-one',
+    name: 'ad-edit-one',
+    component: AdEditOne,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/ad-edit-two',
+    name: 'ad-edit-two',
+    component: AdEditTwo,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/ad-edit-three',
+    name: 'ad-edit-three',
+    component: AdEditThree,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/ad-edit-four',
+    name: 'ad-edit-four',
+    component: AdEditFour,
     meta: {
       requiresAuth: true
     }
