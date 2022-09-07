@@ -1,4 +1,4 @@
-# thrive-studies-editor-remake
+# launch-box-editor
 
 ## Project setup
 ```
