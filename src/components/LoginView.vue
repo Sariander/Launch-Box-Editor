@@ -95,10 +95,14 @@ export default {
     },
     signInWithGoogle: function () {
       const provider = new firebase.auth.GoogleAuthProvider()
-      firebase.auth().signInWithRedirect(provider).then((result) => {
+      firebase.auth().signInWithPopup(provider).then((result) => {
         this.user = result.user
         store.commit('login')
       }).catch(error => console.log(error))
+      // firebase.auth().signInWithRedirect(provider).then((result) => {
+      //   this.user = result.user
+      //   store.commit('login')
+      // }).catch(error => console.log(error))
     },
     signOut: function () {
       firebase.auth().signOut().then(() => {
